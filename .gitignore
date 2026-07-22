@@ -1,0 +1,11 @@
+.git/
+.vscode/
+DebugConfig/
+Objects/
+build/
+
+*.scvd
+*.uvguix
+*.uvguix.Administrator
+JlinkLog.txt
+*.ini
