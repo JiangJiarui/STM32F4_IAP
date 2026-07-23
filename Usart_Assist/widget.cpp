@@ -1,13 +1,15 @@
 #include "widget.h"
 #include "ui_widget.h"
 
+
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
 
-    Widget::PortNameInit();
+    Widget::WidgetInit();
+
 }
 
 Widget::~Widget()
@@ -15,9 +17,13 @@ Widget::~Widget()
     delete ui;
 }
 
-void Widget::PortNameInit(void)
+void Widget::WidgetInit(void)
 {
-    //const QSeriaPortInfo &port = QSerialPortInfo::availablePorts();
+    /* TextLabel Init */
+    ui->label_PortState->setText("Serial Port Closed");
+    ui->label_FileState->setText("choose an bin File");
+
+    /* Portname Init  */
     foreach(const QSerialPortInfo &ports , QSerialPortInfo::availablePorts())
     {
         QSerialPort serial;
@@ -32,6 +38,12 @@ void Widget::PortNameInit(void)
     for(qsizetype i = 0; i < m_PortName.size(); ++i)
     {
         ui->comboBox_PortName->addItem(m_PortName.at(i));
+    }
+
+    /* ReceiveWindow Init */
+    if(!ui->plainTextEdit_ReceiveWindow->isReadOnly())
+    {
+        ui->plainTextEdit_ReceiveWindow->setReadOnly(true);
     }
 }
 
@@ -74,14 +86,197 @@ void Widget::on_Button_Open_clicked()
             break;
     }
     //set Checkbits
-    switch(ui->comboBox_CheckBits->currentIndex())
+    switch(ui->comboBox_ParityBits->currentIndex())
     {
         case 0:
-        m_pSerialPort->
+            m_pSerialPort->setParity(QSerialPort::NoParity);
+            break;
+        case 1:
+            m_pSerialPort->setParity(QSerialPort::EvenParity);
+            break;
+        case 2:
+            m_pSerialPort->setParity(QSerialPort::OddParity);
+            break;
+        case 3:
+            m_pSerialPort->setParity(QSerialPort::SpaceParity);
+            break;
+        case 4:
+            m_pSerialPort->setParity(QSerialPort::MarkParity);
+            break;
+        default:
+            break;
+    }
 
+    switch(ui->comboBox_Flowcontrol->currentIndex())
+    {
+        case 0:
+            m_pSerialPort->setFlowControl(QSerialPort::NoFlowControl);
+            break;
+        case 1:
+            m_pSerialPort->setFlowControl(QSerialPort::HardwareControl);
+            break;
+        case 2:
+            m_pSerialPort->setFlowControl(QSerialPort::SoftwareControl);
+            break;
+        default:
+            break;
     }
 
 
-    ui->label_PortState->setText("Serial Port Opened!");
+    connect(m_pSerialPort, SIGNAL(readyRead()), this,
+            SLOT(on_PlainTextEdit_ReceiveWindow_Show()));
+
+    if(m_pSerialPort->open(QIODeviceBase::ReadWrite))
+    {
+        ui->label_PortState->setText("Serial Port Opened");
+        ui->Button_Open->setEnabled(false);
+        ui->Button_Close->setEnabled(true);
+        ui->comboBox_Baudrate->setEnabled(false);
+        ui->comboBox_Databits->setEnabled(false);
+        ui->comboBox_Flowcontrol->setEnabled(false);
+        ui->comboBox_ParityBits->setEnabled(false);
+        ui->comboBox_Stopbits->setEnabled(false);
+        ui->comboBox_PortName->setEnabled(false);
+    }
+    else
+    {
+        ui->label_PortState->setText("Serial Port Opened Failed!");
+    }
+
+
 }
+
+
+void Widget::on_Button_Close_clicked()
+{
+    if(m_pSerialPort == nullptr)
+    {
+        return;
+    }
+    m_pSerialPort->close();
+    delete m_pSerialPort;
+    m_pSerialPort = nullptr;
+
+    ui->label_PortState->setText("Serial Port Closed");
+    ui->Button_Close->setEnabled(false);
+    ui->Button_Open->setEnabled(true);
+    ui->comboBox_Baudrate->setEnabled(true);
+    ui->comboBox_Databits->setEnabled(true);
+    ui->comboBox_Flowcontrol->setEnabled(true);
+    ui->comboBox_ParityBits->setEnabled(true);
+    ui->comboBox_Stopbits->setEnabled(true);
+    ui->comboBox_PortName->setEnabled(true);
+
+}
+
+
+
+void Widget::on_Button_Send_clicked()
+{
+    if((m_pSerialPort != nullptr) && (m_pSerialPort->isOpen()))
+    {
+        QString StringToSend = ui->plainTextEdit_SendWindow->toPlainText();
+        QByteArray BytesToSend = StringToSend.toUtf8();
+
+        if(!m_pSerialPort->write(BytesToSend))
+        {
+            qDebug("SerialPort Send Error");
+            return;
+        }
+
+    }
+}
+
+
+
+void Widget::on_pushButton_SendClear_clicked()
+{
+    if(!ui->plainTextEdit_SendWindow->toPlainText().isEmpty())
+    {
+        ui->plainTextEdit_SendWindow->clear();
+    }
+    else
+    {
+        return;
+    }
+}
+
+
+
+void Widget::on_PlainTextEdit_ReceiveWindow_Show()
+{
+    QByteArray ReceivedData;
+    QString strBuf;
+    ReceivedData = m_pSerialPort->readAll();
+    if(!ReceivedData.isEmpty())
+    {
+        strBuf += QString(ReceivedData).append("\r\n");
+    }
+    else
+    {
+        return;
+    }
+    ui->plainTextEdit_ReceiveWindow->insertPlainText(strBuf);
+}
+
+
+/**************************** File Transmit Function ***********************************/
+void Widget::on_pushButton_FileOpen_clicked()
+{
+    QString Filename = QFileDialog::getOpenFileName(this, "选择bin文件",
+                                                    "/",
+                                                    "*.bin");
+    if(!Filename.isEmpty())
+    {
+        ui->label_FileState->setText(Filename);
+        m_pFile = new QFile(Filename);
+
+        if(!m_pFile->open(QIODeviceBase::ReadOnly))
+        {
+            qDebug("File Open Error");
+        }
+        m_ReadData = m_pFile->readAll();
+
+        qDebug("File Read Success");
+        m_pFile->close();
+    }
+    else
+    {
+        return;
+    }
+}
+
+
+void Widget::on_pushButton_FileSend_clicked()
+{
+    if(m_pSerialPort == nullptr)
+    {
+        ui->label_FileState->setText("Serial not Opened!");
+        return;
+    }
+
+    if(m_ReadData.isEmpty())
+    {
+        qDebug("Empty File!");
+        return;
+    }
+
+    if(m_pFile != nullptr)
+    {
+        uint32_t count = 0;
+        count = m_pSerialPort->write(m_ReadData); //using `.toHex` will convert the data to ASCII!
+        if(!m_pSerialPort->waitForBytesWritten(200))
+        {
+            qDebug("File Read False");
+        }
+
+        qDebug() << count << "Bytes have been sended";
+    }
+    else
+    {
+        ui->label_FileState->setText("choose an bin File");
+    }
+
+}
+/************************************************************************************/
 

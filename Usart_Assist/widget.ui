@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>598</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,13 +18,13 @@
     <rect>
      <x>50</x>
      <y>260</y>
-     <width>181</width>
+     <width>191</width>
      <height>21</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <pointsize>9</pointsize>
     </font>
    </property>
    <property name="text">
@@ -34,7 +34,7 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>40</x>
@@ -72,7 +72,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>60</x>
@@ -330,7 +330,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_6">
       <item>
-       <widget class="QLabel" name="label_Checkbits">
+       <widget class="QLabel" name="label_Paritybits">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -348,7 +348,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="comboBox_CheckBits">
+       <widget class="QComboBox" name="comboBox_ParityBits">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -374,22 +374,22 @@
         </item>
         <item>
          <property name="text">
-          <string>ODD</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
           <string>EVEN</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>MARK</string>
+          <string>ODD</string>
          </property>
         </item>
         <item>
          <property name="text">
           <string>SPACE</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>MARK</string>
          </property>
         </item>
        </widget>
@@ -399,7 +399,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
-       <widget class="QLabel" name="label_Streamctr">
+       <widget class="QLabel" name="label_Flowcontrol">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -417,7 +417,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="comboBox_Streamctr">
+       <widget class="QComboBox" name="comboBox_Flowcontrol">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -443,17 +443,102 @@
         </item>
         <item>
          <property name="text">
-          <string>XON/XOFF</string>
+          <string>RTS/CTS</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>RTS/CTS</string>
+          <string>XON/XOFF</string>
          </property>
         </item>
        </widget>
       </item>
      </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QPlainTextEdit" name="plainTextEdit_ReceiveWindow">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>20</y>
+     <width>470</width>
+     <height>300</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="plainTextEdit_SendWindow">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>349</y>
+     <width>470</width>
+     <height>140</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Button_Send">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>500</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>发送</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Button_SendClear">
+   <property name="geometry">
+    <rect>
+     <x>540</x>
+     <y>500</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>清除</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_FileState">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>340</y>
+     <width>201</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>370</y>
+     <width>195</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_8">
+    <item>
+     <widget class="QPushButton" name="pushButton_FileOpen">
+      <property name="text">
+       <string>打开文件</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="pushButton_FileSend">
+      <property name="text">
+       <string>发送文件</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
