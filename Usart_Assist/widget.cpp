@@ -1,6 +1,8 @@
 #include "widget.h"
 #include "ui_widget.h"
 
+#include "UserFile.h"
+
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -236,6 +238,7 @@ void Widget::on_pushButton_FileOpen_clicked()
             qDebug("File Open Error");
         }
         m_ReadData = m_pFile->readAll();
+
 
         qDebug("File Read Success");
         m_pFile->close();
