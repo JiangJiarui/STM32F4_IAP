@@ -43,6 +43,7 @@ private slots:
 
     void on_pushButton_FileSend_clicked();
 
+
 private:
     Ui::Widget *ui;
 

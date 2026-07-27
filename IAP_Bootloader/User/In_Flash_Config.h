@@ -12,7 +12,7 @@
 #define Sector_Zone_APP1	FLASH_Sector_6
 #define Sector_Zone_APP2	FLASH_Sector_7
 
-#define Received_Buffer_Size	4  //Byte
+#define DMA_Buffer_Size	256  //Byte
 
 
 

@@ -10,6 +10,12 @@ uint16_t UserFrame::length()
     return (uint16_t)m_frame[2] | ((uint16_t)m_frame[3] << 8);;
 }
 
+uint16_t UserFrame::total_length()
+{
+    uint16_t len = length();
+    return len+10;
+}
+
 
 UserFrame::UserFrame(int16_t cmd, uint16_t length, uint8_t* payload)
 {
@@ -30,6 +36,10 @@ UserFrame::UserFrame(int16_t cmd, uint16_t length, uint8_t* payload)
         {
             m_frame[i+ header_len] = *(payload + i);
         }
+    }
+    else if(payload == nullptr && length == 0)
+    {
+        ;
     }
     else
     {
@@ -81,4 +91,5 @@ uint16_t UserFrame::prCRC_Cal(uint8_t parityframe[], uint16_t length)
 
     return crc;
 }
+
 

@@ -815,6 +815,16 @@
               <FileType>5</FileType>
               <FilePath>.\User\led\bsp_led.h</FilePath>
             </File>
+            <File>
+              <FileName>buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\buffer\buffer.c</FilePath>
+            </File>
+            <File>
+              <FileName>buffer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\buffer\buffer.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

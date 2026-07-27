@@ -222,6 +222,8 @@ void Widget::on_PlainTextEdit_ReceiveWindow_Show()
 }
 
 
+
+
 /**************************** File Transmit Function ***********************************/
 void Widget::on_pushButton_FileOpen_clicked()
 {
@@ -238,8 +240,6 @@ void Widget::on_pushButton_FileOpen_clicked()
             qDebug("File Open Error");
         }
         m_ReadData = m_pFile->readAll();
-
-
         qDebug("File Read Success");
         m_pFile->close();
     }
@@ -249,9 +249,9 @@ void Widget::on_pushButton_FileOpen_clicked()
     }
 }
 
-
+#if 0
 void Widget::on_pushButton_FileSend_clicked()
-{
+{ 
     if(m_pSerialPort == nullptr)
     {
         ui->label_FileState->setText("Serial not Opened!");
@@ -281,5 +281,86 @@ void Widget::on_pushButton_FileSend_clicked()
     }
 
 }
+
+#elif 1
+
+void Widget::on_pushButton_FileSend_clicked()
+{
+    QByteArray framearray;
+
+
+    if(m_pSerialPort == nullptr)
+    {
+        ui->label_FileState->setText("Serial not Opened!");
+        return;
+    }
+
+    if(m_ReadData.isEmpty())
+    {
+        qDebug("Empty File!");
+        return;
+    }
+
+    if(m_pFile != nullptr)
+    {
+        uint32_t i = m_ReadData.length() / MAX_BUFSIZE;
+        uint32_t j = m_ReadData.length() % MAX_BUFSIZE;
+
+//        uint32_t i = 4;
+//        uint32_t j = 0;
+
+        if(i != 0)
+        {
+            uint32_t k = 0;
+            while(i--)
+            {
+                QByteArray ackinfo;
+                QByteArray buf = m_ReadData.mid(MAX_BUFSIZE*(k++), MAX_BUFSIZE);
+                UserFrame* frame = new UserFrame(0xabcd, buf.length(), (uint8_t*)buf.data());
+                framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
+                qDebug() << framearray.toHex(' ');
+                m_pSerialPort->write(framearray);
+
+                delete frame;
+            }
+
+            if(j != 0)
+            {
+                QByteArray buf = m_ReadData.mid(MAX_BUFSIZE * k, j);
+                UserFrame* frame = new UserFrame(0xabcd, buf.length(), (uint8_t*)buf.data());
+                framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
+                qDebug() << framearray.toHex(' ');
+                m_pSerialPort->write(framearray);
+                delete frame;
+            }
+        }
+        else
+        {
+            QByteArray buf = m_ReadData.left(j);
+            UserFrame* frame = new UserFrame(0xabcd, buf.length(), (uint8_t*)buf.data());
+            framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
+            qDebug() << framearray.toHex(' ');
+            m_pSerialPort->write(framearray);
+            delete frame;
+        }
+#if 1
+        QByteArray ackinfo;
+        UserFrame* frame = new UserFrame(0xaecd, 0, nullptr);
+        framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
+        qDebug() << framearray.toHex(' ');
+        m_pSerialPort->write(framearray);
+
+        delete frame;
+#endif
+
+    }
+    else
+    {
+        ui->label_FileState->setText("choose an bin File");
+    }
+
+}
+
+#endif
 /************************************************************************************/
 

@@ -1,13 +1,30 @@
 #include "./usart/bsp_usart.h"
 #include "./led/bsp_led.h"
 #include "./In_Flash_Config.h"
+#include "./buffer/buffer.h"
 
-volatile uint8_t Received_FILE_Buffer1[Received_Buffer_Size]	__attribute__((aligned(4)));
-volatile uint8_t Received_FILE_Buffer2[Received_Buffer_Size]	__attribute__((aligned(4)));
+
+
+#define Header_len 4
+
+
+volatile uint8_t Received_FILE_Buffer1[DMA_Buffer_Size]	__attribute__((aligned(4)));
+volatile uint8_t Received_FILE_Buffer2[DMA_Buffer_Size]	__attribute__((aligned(4)));
+
+
+
 
 extern uint8_t Buffer1_Full_Flag;
 extern uint8_t Buffer2_Full_Flag;
 extern uint8_t Usart_Receive_Complete_Flag;
+
+uint32_t count = 0;
+uint16_t Frame_ReadyToRead = 0;
+
+Buffer xRingBuffer;
+Frame  xUsartFrame;
+
+
 
 __ASM void Switch_To_APP(void)
 {	
@@ -28,18 +45,43 @@ __ASM void Switch_To_APP(void)
 	nop
 }
 
+void Flash_Write(uint8_t* src, uint8_t* dest, uint16_t bufsize)
+{
+	uint8_t* pread = src;
+	uint8_t* pwrite = dest;
+	while(pread != src + bufsize)
+	{
+		while(FLASH_ProgramWord((uint32_t)pwrite,*(uint32_t *)pread) != FLASH_COMPLETE)
+		{
+			;
+		}
+		pread += 4;
+		pwrite += 4;
+	}	
+}
+
+
+typedef enum{
+			Correct, Error
+}Result;
+
+
+			
+void Send_ACK(void)
+{
+	Usart_SendByte(DEBUG_USART, 0xaa);
+}
 
 int main(void)
 {
-	uint8_t * pWrite_Flash = NULL;
-	uint8_t * pRead_Buffer = NULL;
+	uint8_t* pWrite_Flash = NULL;
 	
 	USART_Config();
 	LED_GPIO_Config();
 
 	USART_DMA_Config((uint32_t *)Received_FILE_Buffer1, 
 										(uint32_t *)Received_FILE_Buffer2, 
-										(uint32_t)Received_Buffer_Size);
+										(uint32_t)DMA_Buffer_Size);
 	USART_DMACmd(DEBUG_USART, USART_DMAReq_Rx, ENABLE);
 	
 	FLASH_Unlock();
@@ -49,49 +91,58 @@ int main(void)
 	pWrite_Flash = (uint8_t*)Addr_Zone_APP1;
 	while(FLASH_EraseSector(Sector_Zone_APP1, VoltageRange_3) != FLASH_COMPLETE)
 		;
-	DEBUG_INFO("FLASH erase and rewrite successful");
+	DEBUG_INFO("FLASH erase successful");
+	
+	
+	BufferInit(&xRingBuffer);
 	
 	LED1_ON;
 
+	
 	while(1)
 		{
-				if(Buffer1_Full_Flag == 1)
+			
+			#if 0
+			if(*(uint16_t*)xRingBuffer.pRead == 0xabcd)
+			{
+				uint16_t len = *(uint16_t*)(xRingBuffer.pRead + 2);
+				Flash_Write(xRingBuffer.pRead+4, pWrite_Flash, len);
+				pWrite_Flash = pWrite_Flash + len;
+				
+				for(uint32_t i = len + 10; i; i--)
 				{
-					pRead_Buffer = (uint8_t *)Received_FILE_Buffer1;
-					
-					while(pRead_Buffer != Received_FILE_Buffer1 + Received_Buffer_Size)
+					xRingBuffer.pRead ++;
+					if(xRingBuffer.pRead == xRingBuffer.pEnd)
 					{
-						while(FLASH_ProgramWord((uint32_t)pWrite_Flash,*(uint32_t *)pRead_Buffer) != FLASH_COMPLETE)
-						{
-							;
-						}
-						pRead_Buffer += 4;
-						pWrite_Flash += 4;
+						xRingBuffer.pRead = xRingBuffer.buf;
 					}
-					Buffer1_Full_Flag = 0;
+				}
+			}
+			#endif
+#if 1			
+
+			if(get_frame(&xRingBuffer, &xUsartFrame) != 0)
+			{
+				count++;
+				if(xUsartFrame.cmd == CMD_WRITE && Usart_Receive_Complete_Flag ==0)
+				{
+					Flash_Write(xUsartFrame.ppayload, pWrite_Flash, xUsartFrame.length);
+					pWrite_Flash += xUsartFrame.length;
 
 				}
-				else if(Buffer2_Full_Flag == 1)
+				else if(xUsartFrame.cmd == CMD_END)
 				{
-					pRead_Buffer = (uint8_t *)Received_FILE_Buffer2;
-					
-					while(pRead_Buffer != Received_FILE_Buffer2 + Received_Buffer_Size)
-					{
-						while(FLASH_ProgramWord((uint32_t)pWrite_Flash,*(uint32_t *)pRead_Buffer) != FLASH_COMPLETE)
-						{
-							;
-						}
-						pRead_Buffer += 4;
-						pWrite_Flash += 4;
-					}
-					Buffer2_Full_Flag = 0;
-				}
+					Usart_Receive_Complete_Flag = 1;		//avoid from loop in the RingBuffer
+					ClearBuffer(&xRingBuffer);
 
-				if(Usart_Receive_Complete_Flag == 1 && ((Buffer1_Full_Flag|Buffer2_Full_Flag) == 0))
-				{
-					Usart_Receive_Complete_Flag = 0;
-					Switch_To_APP();
+					//Switch_To_APP();				
 				}
+				
+			}
+			
+#endif				
+			
+			
 		}
 }
 

@@ -31,6 +31,7 @@
 #include "stm32f4xx_it.h"
 #include "./usart/bsp_usart.h"
 #include "./In_Flash_Config.h"
+#include "./buffer/buffer.h"
 
 /** @addtogroup Template_Project
   * @{
@@ -45,6 +46,9 @@
 /* Private variables ---------------------------------------------------------*/
 extern volatile uint8_t Received_FILE_Buffer1[];
 extern volatile uint8_t Received_FILE_Buffer2[];
+extern Buffer xRingBuffer;
+extern uint16_t Frame_ReadyToRead;
+
 
 Buffer_State eCurrent_Receiving_Buffer;
 
@@ -54,6 +58,7 @@ Buffer_State eCurrent_Receiving_Buffer;
 uint8_t Buffer1_Full_Flag = 0;
 uint8_t Buffer2_Full_Flag = 0;
 uint8_t Usart_Receive_Complete_Flag = 0;
+
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -185,11 +190,12 @@ void DMA2_Stream2_IRQHandler(void)
 	{
 		if((((DEBUG_USART_DMA_STREAM->CR) & (1<<19))>>19) == SET)
 		{
-			Buffer1_Full_Flag = 1;
+			BufferWrite(&xRingBuffer, (uint8_t*)Received_FILE_Buffer1, DMA_Buffer_Size);
+			
 		}
 		else
 		{
-			Buffer2_Full_Flag = 1;
+			BufferWrite(&xRingBuffer, (uint8_t*)Received_FILE_Buffer2, DMA_Buffer_Size);
 		}
 		DMA_ClearITPendingBit(DEBUG_USART_DMA_STREAM, DMA_FLAG_TCIF2);
 	}
@@ -200,36 +206,22 @@ void DMA2_Stream2_IRQHandler(void)
 
 void DEBUG_USART_IRQHandler(void)
 {
-	uint8_t * p = NULL;
 	
 		if(USART_GetITStatus(DEBUG_USART, USART_IT_IDLE) != RESET)
 		{
-				uint32_t Received_Data_Size = Received_Buffer_Size - DEBUG_USART_DMA_STREAM->NDTR;
+				uint32_t Received_Data_Size = DMA_Buffer_Size - DEBUG_USART_DMA_STREAM->NDTR;
 
 				USART_ReceiveData(DEBUG_USART);		//Clear IDLE FLAG
 			
-				if(Received_Data_Size)
+				if((((DEBUG_USART_DMA_STREAM->CR) & (1<<19))>>19) == SET)
 				{
-			
-					if((((DEBUG_USART_DMA_STREAM->CR) & (1<<19))>>19) == SET)	//Memory1 Buffer2
-					{
-						for(p = (uint8_t *)(DEBUG_USART_DMA_STREAM->M1AR + Received_Data_Size); p < (Received_FILE_Buffer2 + Received_Buffer_Size); )
-						{
-							*p++ = 0xff;
-						}
-						Buffer2_Full_Flag = 1;
-					}
-					else
-					{
-						for(p = (uint8_t *)(DEBUG_USART_DMA_STREAM->M0AR + Received_Data_Size); p < (Received_FILE_Buffer1 + Received_Buffer_Size); )
-						{
-							*p++ = 0xff;
-						}
-						Buffer1_Full_Flag = 1;
-					}		
+					BufferWrite(&xRingBuffer, (uint8_t*)Received_FILE_Buffer2, Received_Data_Size);
 				}
-
-        Usart_Receive_Complete_Flag = 1;
+				else
+				{
+					BufferWrite(&xRingBuffer, (uint8_t*)Received_FILE_Buffer1, Received_Data_Size);
+				}
+			
 		}
 		
 }

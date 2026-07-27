@@ -146,6 +146,43 @@ int fgetc(FILE *f)
 		return (int)USART_ReceiveData(DEBUG_USART);
 }
 
+
+
+void Usart_SendByte( USART_TypeDef * pUSARTx, uint8_t ch)
+{
+	USART_SendData(pUSARTx,ch);
+		
+	while (USART_GetFlagStatus(pUSARTx, USART_FLAG_TXE) == RESET);	
+}
+
+
+void Usart_SendString( USART_TypeDef * pUSARTx, char *str)
+{
+	unsigned int k=0;
+  do 
+  {
+      Usart_SendByte( pUSARTx, *(str + k) );
+      k++;
+  } while(*(str + k)!='\0');
+  while(USART_GetFlagStatus(pUSARTx,USART_FLAG_TC)==RESET)
+  {}
+}
+
+void Usart_SendHalfWord( USART_TypeDef * pUSARTx, uint16_t ch)
+{
+	uint8_t temp_h, temp_l;
+
+	temp_h = (ch&0XFF00)>>8;
+	temp_l = ch&0XFF;
+
+	USART_SendData(pUSARTx,temp_h);	
+	while (USART_GetFlagStatus(pUSARTx, USART_FLAG_TXE) == RESET);
+	
+	USART_SendData(pUSARTx,temp_l);	
+	while (USART_GetFlagStatus(pUSARTx, USART_FLAG_TXE) == RESET);	
+}
+
+
 /******************************** END ***********************************/
 
 
