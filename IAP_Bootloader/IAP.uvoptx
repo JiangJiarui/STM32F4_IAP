@@ -118,7 +118,6 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name>腆o</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -204,6 +203,11 @@
           <count>1</count>
           <WinNumber>2</WinNumber>
           <ItemText>count</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>ptr[frame-&gt;length + 6]</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>

@@ -153,6 +153,69 @@ Frame* get_frame(Buffer* src, Frame* tag)
 	return tag;
 }
 
+void ClearFrame(Frame* frame)
+{
+	frame->cmd = 0;
+	frame->length = 0;
+	for(uint32_t i = 0; i < Usart_Frame_Size; i++)
+	{
+		frame->ppayload[i] = 0;
+	}
+	frame->crc = 0;
+}
+
+Result crc_check(Frame* frame)
+{
+	uint8_t ptr[frame->length + 4];
+	uint8_t* p = ptr;
+	uint16_t len = frame->length + 4;
+	uint16_t rest = 0;
+	uint16_t polynom = 0x8005;
+	
+	ptr[0] = (uint8_t)frame->cmd & 0xffu;
+	ptr[1] = (uint8_t)((frame->cmd & 0xff00u)>>8u);
+	ptr[2] = (uint8_t)(frame->length & 0xffu);
+	ptr[3] = (uint8_t)((frame->length & 0xff00u)>>8);
+	
+	for(uint32_t i = 0; i < frame->length; i++)
+	{
+		ptr[4+i] = frame->ppayload[i];
+	}
+	ptr[4 + frame->length] = (uint8_t)(frame->crc & 0xffu);
+	ptr[5 + frame->length] = (uint8_t)((frame->crc & 0xff00u)>>8);
+	
+	while(len--)
+	{
+		for(uint8_t i = 0x80; i; i = i >> 1u)
+		{
+			if((rest & 0x8000) != 0)
+			{
+				rest = rest << 1;
+				rest = rest ^ polynom;
+			}
+			else
+			{
+				rest = rest << 1;
+			}
+			
+			if((*p & i) != 0)
+			{
+				rest = rest ^ polynom;
+			}
+		}
+		p++;
+	}
+	if(rest == frame->crc)
+	{
+		return Correct;
+	}
+	else
+	{
+		return Error;
+	}
+	
+}
+
 
 
 

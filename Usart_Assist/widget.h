@@ -8,6 +8,7 @@
 #include <QPlainTextEdit>
 #include <QFileDialog>
 #include <QFile>
+#include <QEventLoop>
 
 
 QT_BEGIN_NAMESPACE
@@ -35,13 +36,20 @@ private slots:
 
     void on_Button_Send_clicked();
 
-    void on_pushButton_SendClear_clicked();
+    void on_Button_SendClear_clicked();
 
-    void on_PlainTextEdit_ReceiveWindow_Show();
+    void PlainTextEdit_ReceiveWindow_Show();
 
     void on_pushButton_FileOpen_clicked();
 
     void on_pushButton_FileSend_clicked();
+
+    uint8_t ReadSerialPort(QByteArray* bytearray);
+
+signals:
+    void USART_ACK_Received();
+    void USART_NACK_Received();
+    void USART_Info_Received();
 
 
 private:

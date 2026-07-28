@@ -3,7 +3,6 @@
 
 #include "UserFile.h"
 
-
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
@@ -126,7 +125,7 @@ void Widget::on_Button_Open_clicked()
 
 
     connect(m_pSerialPort, SIGNAL(readyRead()), this,
-            SLOT(on_PlainTextEdit_ReceiveWindow_Show()));
+            SLOT(PlainTextEdit_ReceiveWindow_Show()));
 
     if(m_pSerialPort->open(QIODeviceBase::ReadWrite))
     {
@@ -191,7 +190,7 @@ void Widget::on_Button_Send_clicked()
 
 
 
-void Widget::on_pushButton_SendClear_clicked()
+void Widget::on_Button_SendClear_clicked()
 {
     if(!ui->plainTextEdit_SendWindow->toPlainText().isEmpty())
     {
@@ -205,20 +204,50 @@ void Widget::on_pushButton_SendClear_clicked()
 
 
 
-void Widget::on_PlainTextEdit_ReceiveWindow_Show()
+void Widget::PlainTextEdit_ReceiveWindow_Show()
 {
     QByteArray ReceivedData;
     QString strBuf;
     ReceivedData = m_pSerialPort->readAll();
     if(!ReceivedData.isEmpty())
     {
-        strBuf += QString(ReceivedData).append("\r\n");
+        if(ReceivedData.at(0) == (char)0xaa)
+        {
+            qDebug() << "ACK Received";
+            emit USART_ACK_Received();
+            return;
+        }
+        else
+        {
+            strBuf += QString(ReceivedData).append("\r\n");
+        }
     }
     else
     {
         return;
     }
     ui->plainTextEdit_ReceiveWindow->insertPlainText(strBuf);
+}
+
+uint8_t Widget::ReadSerialPort(QByteArray* recv)
+{
+    *recv = m_pSerialPort->readAll();
+    if(!recv->isEmpty())
+    {
+        if((*recv).at(0) == (char)0xaa)
+        {
+            emit USART_ACK_Received();
+        }
+        else
+        {
+            emit USART_Info_Received();
+        }
+    }
+    else
+    {
+        emit USART_Info_Received();
+    }
+    return 0;
 }
 
 
@@ -249,45 +278,13 @@ void Widget::on_pushButton_FileOpen_clicked()
     }
 }
 
-#if 0
-void Widget::on_pushButton_FileSend_clicked()
-{ 
-    if(m_pSerialPort == nullptr)
-    {
-        ui->label_FileState->setText("Serial not Opened!");
-        return;
-    }
-
-    if(m_ReadData.isEmpty())
-    {
-        qDebug("Empty File!");
-        return;
-    }
-
-    if(m_pFile != nullptr)
-    {
-        uint32_t count = 0;
-        count = m_pSerialPort->write(m_ReadData); //using `.toHex` will convert the data to ASCII!
-        if(!m_pSerialPort->waitForBytesWritten(200))
-        {
-            qDebug("File Read False");
-        }
-
-        qDebug() << count << "Bytes have been sended";
-    }
-    else
-    {
-        ui->label_FileState->setText("choose an bin File");
-    }
-
-}
-
-#elif 1
-
 void Widget::on_pushButton_FileSend_clicked()
 {
     QByteArray framearray;
+    QByteArray ackinfo;
+    QEventLoop  WaitforACKloop;
 
+    connect(this, &Widget::USART_ACK_Received, &WaitforACKloop, &QEventLoop::quit);
 
     if(m_pSerialPort == nullptr)
     {
@@ -306,7 +303,7 @@ void Widget::on_pushButton_FileSend_clicked()
         uint32_t i = m_ReadData.length() / MAX_BUFSIZE;
         uint32_t j = m_ReadData.length() % MAX_BUFSIZE;
 
-//        uint32_t i = 4;
+//        uint32_t i = 2;
 //        uint32_t j = 0;
 
         if(i != 0)
@@ -320,7 +317,7 @@ void Widget::on_pushButton_FileSend_clicked()
                 framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
                 qDebug() << framearray.toHex(' ');
                 m_pSerialPort->write(framearray);
-
+                WaitforACKloop.exec();
                 delete frame;
             }
 
@@ -331,6 +328,7 @@ void Widget::on_pushButton_FileSend_clicked()
                 framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
                 qDebug() << framearray.toHex(' ');
                 m_pSerialPort->write(framearray);
+                WaitforACKloop.exec();
                 delete frame;
             }
         }
@@ -341,6 +339,7 @@ void Widget::on_pushButton_FileSend_clicked()
             framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
             qDebug() << framearray.toHex(' ');
             m_pSerialPort->write(framearray);
+            WaitforACKloop.exec();
             delete frame;
         }
 #if 1
@@ -349,7 +348,7 @@ void Widget::on_pushButton_FileSend_clicked()
         framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
         qDebug() << framearray.toHex(' ');
         m_pSerialPort->write(framearray);
-
+        WaitforACKloop.exec();
         delete frame;
 #endif
 
@@ -360,7 +359,5 @@ void Widget::on_pushButton_FileSend_clicked()
     }
 
 }
-
-#endif
 /************************************************************************************/
 

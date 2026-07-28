@@ -11,20 +11,10 @@
 volatile uint8_t Received_FILE_Buffer1[DMA_Buffer_Size]	__attribute__((aligned(4)));
 volatile uint8_t Received_FILE_Buffer2[DMA_Buffer_Size]	__attribute__((aligned(4)));
 
-
-
-
-extern uint8_t Buffer1_Full_Flag;
-extern uint8_t Buffer2_Full_Flag;
-extern uint8_t Usart_Receive_Complete_Flag;
-
-uint32_t count = 0;
-uint16_t Frame_ReadyToRead = 0;
+uint8_t Receive_Complete_Flag = 0;
 
 Buffer xRingBuffer;
 Frame  xUsartFrame;
-
-
 
 __ASM void Switch_To_APP(void)
 {	
@@ -61,15 +51,14 @@ void Flash_Write(uint8_t* src, uint8_t* dest, uint16_t bufsize)
 }
 
 
-typedef enum{
-			Correct, Error
-}Result;
-
-
-			
 void Send_ACK(void)
 {
 	Usart_SendByte(DEBUG_USART, 0xaa);
+}
+
+void Send_NACK(void)
+{
+	Usart_SendByte(DEBUG_USART, 0xff);
 }
 
 int main(void)
@@ -100,48 +89,37 @@ int main(void)
 
 	
 	while(1)
-		{
-			
-			#if 0
-			if(*(uint16_t*)xRingBuffer.pRead == 0xabcd)
-			{
-				uint16_t len = *(uint16_t*)(xRingBuffer.pRead + 2);
-				Flash_Write(xRingBuffer.pRead+4, pWrite_Flash, len);
-				pWrite_Flash = pWrite_Flash + len;
-				
-				for(uint32_t i = len + 10; i; i--)
-				{
-					xRingBuffer.pRead ++;
-					if(xRingBuffer.pRead == xRingBuffer.pEnd)
-					{
-						xRingBuffer.pRead = xRingBuffer.buf;
-					}
-				}
-			}
-			#endif
-#if 1			
-
+		{		
 			if(get_frame(&xRingBuffer, &xUsartFrame) != 0)
 			{
-				count++;
-				if(xUsartFrame.cmd == CMD_WRITE && Usart_Receive_Complete_Flag ==0)
+				if(xUsartFrame.cmd == CMD_WRITE)
 				{
-					Flash_Write(xUsartFrame.ppayload, pWrite_Flash, xUsartFrame.length);
-					pWrite_Flash += xUsartFrame.length;
-
+					if(crc_check(&xUsartFrame)!=Error)
+					{
+						Flash_Write(xUsartFrame.ppayload, pWrite_Flash, xUsartFrame.length);
+						pWrite_Flash += xUsartFrame.length;
+						Send_ACK();
+					}
+					else
+					{
+						Send_NACK();
+					}
 				}
 				else if(xUsartFrame.cmd == CMD_END)
 				{
-					Usart_Receive_Complete_Flag = 1;		//avoid from loop in the RingBuffer
-					ClearBuffer(&xRingBuffer);
-
-					//Switch_To_APP();				
+					if(crc_check(&xUsartFrame)!=Error)
+					{
+						Receive_Complete_Flag = 1;
+						Send_ACK();
+						Switch_To_APP();
+					}
+					else
+					{
+						Send_NACK();
+					}
 				}
-				
-			}
-			
-#endif				
-			
+				ClearFrame(&xUsartFrame);
+			}			
 			
 		}
 }

@@ -20,8 +20,6 @@ typedef enum{
 	NONE, Buffer1, Buffer2, FINISH
 }Buffer_State;
 
-extern Buffer_State eCurrent_Receiving_Buffer;		//define at _it.c
-
 
 
 //#define Buffer1 1

@@ -47,17 +47,14 @@
 extern volatile uint8_t Received_FILE_Buffer1[];
 extern volatile uint8_t Received_FILE_Buffer2[];
 extern Buffer xRingBuffer;
-extern uint16_t Frame_ReadyToRead;
 
-
-Buffer_State eCurrent_Receiving_Buffer;
-
-
-
+extern uint8_t Receive_Complete_Flag;
 
 uint8_t Buffer1_Full_Flag = 0;
 uint8_t Buffer2_Full_Flag = 0;
-uint8_t Usart_Receive_Complete_Flag = 0;
+uint8_t offset = 0;
+uint8_t old_offset1 = 0;
+uint8_t old_offset2 = 0;
 
 
 /* Private function prototypes -----------------------------------------------*/
@@ -190,12 +187,12 @@ void DMA2_Stream2_IRQHandler(void)
 	{
 		if((((DEBUG_USART_DMA_STREAM->CR) & (1<<19))>>19) == SET)
 		{
-			BufferWrite(&xRingBuffer, (uint8_t*)Received_FILE_Buffer1, DMA_Buffer_Size);
-			
+			Buffer1_Full_Flag = 1;
+					
 		}
 		else
 		{
-			BufferWrite(&xRingBuffer, (uint8_t*)Received_FILE_Buffer2, DMA_Buffer_Size);
+			Buffer2_Full_Flag = 1;		
 		}
 		DMA_ClearITPendingBit(DEBUG_USART_DMA_STREAM, DMA_FLAG_TCIF2);
 	}
@@ -209,19 +206,49 @@ void DEBUG_USART_IRQHandler(void)
 	
 		if(USART_GetITStatus(DEBUG_USART, USART_IT_IDLE) != RESET)
 		{
-				uint32_t Received_Data_Size = DMA_Buffer_Size - DEBUG_USART_DMA_STREAM->NDTR;
-
 				USART_ReceiveData(DEBUG_USART);		//Clear IDLE FLAG
 			
-				if((((DEBUG_USART_DMA_STREAM->CR) & (1<<19))>>19) == SET)
+				offset = DMA_Buffer_Size - DEBUG_USART_DMA_STREAM->NDTR;
+			
+				if(Buffer1_Full_Flag|Buffer2_Full_Flag)
 				{
-					BufferWrite(&xRingBuffer, (uint8_t*)Received_FILE_Buffer2, Received_Data_Size);
+						if(Buffer1_Full_Flag)
+						{
+							BufferWrite(&xRingBuffer, (uint8_t*)Received_FILE_Buffer1 + old_offset1, DMA_Buffer_Size - old_offset1);
+							old_offset1 = 0;
+							BufferWrite(&xRingBuffer, (uint8_t*)Received_FILE_Buffer2, offset);
+							old_offset2 = offset;
+							Buffer1_Full_Flag = 0;
+						}
+						else
+						{
+							BufferWrite(&xRingBuffer, (uint8_t*)Received_FILE_Buffer2 + old_offset2, DMA_Buffer_Size - old_offset2);
+							old_offset2 = 0;
+							BufferWrite(&xRingBuffer, (uint8_t*)Received_FILE_Buffer1, offset);
+							old_offset1 = offset;
+							Buffer2_Full_Flag = 0;
+						}
 				}
 				else
 				{
-					BufferWrite(&xRingBuffer, (uint8_t*)Received_FILE_Buffer1, Received_Data_Size);
+					if((((DEBUG_USART_DMA_STREAM->CR) & (1<<19))>>19) == SET)
+					{
+						BufferWrite(&xRingBuffer, (uint8_t*)Received_FILE_Buffer2 + old_offset2, offset - old_offset2);
+						old_offset2 = offset;
+					}
+					else
+					{
+						BufferWrite(&xRingBuffer, (uint8_t*)Received_FILE_Buffer1 + old_offset1, offset - old_offset1);
+						old_offset1 = offset;
+					}
 				}
-			
+		
+				if(Receive_Complete_Flag != 0)
+				{
+					offset = 0;
+					old_offset1 = 0;
+					old_offset2 = 0;
+				}			
 		}
 		
 }
