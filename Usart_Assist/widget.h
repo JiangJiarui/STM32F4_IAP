@@ -44,7 +44,6 @@ private slots:
 
     void on_pushButton_FileSend_clicked();
 
-    uint8_t ReadSerialPort(QByteArray* bytearray);
 
 signals:
     void USART_ACK_Received();
@@ -62,6 +61,9 @@ private:
 
     QFile* m_pFile;
     QByteArray m_ReadData;
+
+    uint8_t ack_flag;
+    uint8_t nack_flag;
 
 };
 #endif // WIDGET_H

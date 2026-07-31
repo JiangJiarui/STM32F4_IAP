@@ -214,6 +214,14 @@ void Widget::PlainTextEdit_ReceiveWindow_Show()
         if(ReceivedData.at(0) == (char)0xaa)
         {
             qDebug() << "ACK Received";
+            ack_flag = 1;
+            emit USART_ACK_Received();
+            return;
+        }
+        else if(ReceivedData.at(0) == (char)0xff)
+        {
+            qDebug() << "NACK Received";
+            nack_flag = 1;
             emit USART_ACK_Received();
             return;
         }
@@ -229,26 +237,6 @@ void Widget::PlainTextEdit_ReceiveWindow_Show()
     ui->plainTextEdit_ReceiveWindow->insertPlainText(strBuf);
 }
 
-uint8_t Widget::ReadSerialPort(QByteArray* recv)
-{
-    *recv = m_pSerialPort->readAll();
-    if(!recv->isEmpty())
-    {
-        if((*recv).at(0) == (char)0xaa)
-        {
-            emit USART_ACK_Received();
-        }
-        else
-        {
-            emit USART_Info_Received();
-        }
-    }
-    else
-    {
-        emit USART_Info_Received();
-    }
-    return 0;
-}
 
 
 
@@ -281,7 +269,6 @@ void Widget::on_pushButton_FileOpen_clicked()
 void Widget::on_pushButton_FileSend_clicked()
 {
     QByteArray framearray;
-    QByteArray ackinfo;
     QEventLoop  WaitforACKloop;
 
     connect(this, &Widget::USART_ACK_Received, &WaitforACKloop, &QEventLoop::quit);
@@ -303,61 +290,77 @@ void Widget::on_pushButton_FileSend_clicked()
         uint32_t i = m_ReadData.length() / MAX_BUFSIZE;
         uint32_t j = m_ReadData.length() % MAX_BUFSIZE;
 
-//        uint32_t i = 2;
-//        uint32_t j = 0;
-
-        if(i != 0)
+        uint32_t k = 0;
+        while(i--)
         {
-            uint32_t k = 0;
-            while(i--)
-            {
-                QByteArray ackinfo;
-                QByteArray buf = m_ReadData.mid(MAX_BUFSIZE*(k++), MAX_BUFSIZE);
-                UserFrame* frame = new UserFrame(0xabcd, buf.length(), (uint8_t*)buf.data());
-                framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
-                qDebug() << framearray.toHex(' ');
-                m_pSerialPort->write(framearray);
-                WaitforACKloop.exec();
-                delete frame;
-            }
-
-            if(j != 0)
-            {
-                QByteArray buf = m_ReadData.mid(MAX_BUFSIZE * k, j);
-                UserFrame* frame = new UserFrame(0xabcd, buf.length(), (uint8_t*)buf.data());
-                framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
-                qDebug() << framearray.toHex(' ');
-                m_pSerialPort->write(framearray);
-                WaitforACKloop.exec();
-                delete frame;
-            }
-        }
-        else
-        {
-            QByteArray buf = m_ReadData.left(j);
+            QByteArray buf = m_ReadData.mid(MAX_BUFSIZE*(k++), MAX_BUFSIZE);
             UserFrame* frame = new UserFrame(0xabcd, buf.length(), (uint8_t*)buf.data());
             framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
+            while(1)
+            {
+                qDebug() << framearray.toHex(' ');
+                m_pSerialPort->write(framearray);
+                WaitforACKloop.exec();
+                if(ack_flag)
+                {
+                    ack_flag = 0;
+                    break;
+                }
+                else if(nack_flag)
+                {
+                    nack_flag = 0;
+                }
+            }
+            delete frame;
+        }
+
+        if(j != 0)
+        {
+            QByteArray buf = m_ReadData.mid(MAX_BUFSIZE * k, j);
+            UserFrame* frame = new UserFrame(0xabcd, buf.length(), (uint8_t*)buf.data());
+            framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
+            while(1)
+            {
+                qDebug() << framearray.toHex(' ');
+                m_pSerialPort->write(framearray);
+                WaitforACKloop.exec();
+                if(ack_flag)
+                {
+                    ack_flag = 0;
+                    break;
+                }
+                else if(nack_flag)
+                {
+                    nack_flag = 0;
+                }
+            }
+            delete frame;
+        }
+
+        UserFrame* frame = new UserFrame(0xaecd, 0, nullptr);
+        framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
+        while(1)
+        {
             qDebug() << framearray.toHex(' ');
             m_pSerialPort->write(framearray);
             WaitforACKloop.exec();
-            delete frame;
+            if(ack_flag)
+            {
+                ack_flag = 0;
+                break;
+            }
+            else if(nack_flag)
+            {
+                nack_flag = 0;
+            }
         }
-#if 1
-        QByteArray ackinfo;
-        UserFrame* frame = new UserFrame(0xaecd, 0, nullptr);
-        framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
-        qDebug() << framearray.toHex(' ');
-        m_pSerialPort->write(framearray);
-        WaitforACKloop.exec();
         delete frame;
-#endif
-
     }
+
     else
     {
         ui->label_FileState->setText("choose an bin File");
     }
-
 }
 /************************************************************************************/
 

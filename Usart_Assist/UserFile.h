@@ -2,6 +2,8 @@
 #define User_FILE_H
 
 #include <QWidget>
+#include <QEventLoop>
+#include <QSerialPort>
 
 #define MAX_BUFSIZE 128
 
@@ -22,6 +24,8 @@ private:
     uint8_t m_frame[MAX_BUFSIZE + 10];
 
     uint16_t prCRC_Cal(uint8_t parityframe[], uint16_t length);
+
+
 };
 
 
