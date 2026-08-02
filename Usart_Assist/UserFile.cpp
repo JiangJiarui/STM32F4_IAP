@@ -22,6 +22,7 @@ UserFrame::UserFrame(int16_t cmd, uint16_t length, uint8_t* payload)
     uint8_t header_len = sizeof(cmd) + sizeof(length);
     uint8_t *ptr = m_frame;
     uint16_t crc = 0;
+    uint16_t length_aligned = 0;
 
     /* Header */
     m_frame[0] = (uint8_t)(cmd & 0xffu);
@@ -35,6 +36,16 @@ UserFrame::UserFrame(int16_t cmd, uint16_t length, uint8_t* payload)
         for(int i =0; i < length; i++)
         {
             m_frame[i+ header_len] = *(payload + i);
+        }
+        if((length & 0x0003) != 0x00)       // aligned for 4 bytes
+        {
+            length_aligned = length + (4-(length & 0x0003));
+            for(int i = 0; i < (length_aligned - length); i++)
+            {
+                m_frame[length + i] = 0xff;
+            }
+            m_frame[2] = (uint8_t)(length_aligned & 0xffu);
+            m_frame[3] = (uint8_t)((length_aligned & 0xff00u)>>8);
         }
     }
     else if(payload == nullptr && length == 0)

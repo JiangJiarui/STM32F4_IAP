@@ -63,7 +63,6 @@ void Usart_SendHalfWord( USART_TypeDef * pUSARTx, uint16_t ch);
 void USART_DMA_Config(uint32_t * Memory1_Address, uint32_t * Memory2_Address, uint32_t Buffer_Size);
 void Usart_DMA_BufferSwitch(uint32_t MemoryBaseAddr, uint32_t DMA_MemoryTarget);
 
-void Usart_DeConfig(void);
 
 
 #endif	// __BSP_USART_H

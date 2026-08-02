@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QEventLoop>
+#include <QTimer>
 
 
 QT_BEGIN_NAMESPACE

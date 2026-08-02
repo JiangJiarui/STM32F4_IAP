@@ -46,6 +46,7 @@ void Widget::WidgetInit(void)
     {
         ui->plainTextEdit_ReceiveWindow->setReadOnly(true);
     }
+    ui->plainTextEdit_ReceiveWindow->setLineWrapMode(QPlainTextEdit::NoWrap);
 }
 
 void Widget::on_Button_Open_clicked()
@@ -227,7 +228,7 @@ void Widget::PlainTextEdit_ReceiveWindow_Show()
         }
         else
         {
-            strBuf += QString(ReceivedData).append("\r\n");
+            strBuf += QString(ReceivedData);
         }
     }
     else
@@ -270,6 +271,7 @@ void Widget::on_pushButton_FileSend_clicked()
 {
     QByteArray framearray;
     QEventLoop  WaitforACKloop;
+    QEventLoop timer;
 
     connect(this, &Widget::USART_ACK_Received, &WaitforACKloop, &QEventLoop::quit);
 
@@ -284,6 +286,15 @@ void Widget::on_pushButton_FileSend_clicked()
         qDebug("Empty File!");
         return;
     }
+
+
+    QByteArray startsignal;
+    startsignal.append('a');
+    m_pSerialPort->write(startsignal);
+    QTimer::singleShot(8000, &timer, &QEventLoop::quit);
+    qDebug() << "send boot cmd and wait";
+    timer.exec();
+    qDebug() << "wait over";
 
     if(m_pFile != nullptr)
     {
@@ -362,5 +373,7 @@ void Widget::on_pushButton_FileSend_clicked()
         ui->label_FileState->setText("choose an bin File");
     }
 }
+
+
 /************************************************************************************/
 

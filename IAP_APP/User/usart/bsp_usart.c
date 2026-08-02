@@ -1,7 +1,7 @@
 #include "./usart/bsp_usart.h"
 
 
-
+#if 0
 static void NVIC_Config(void)
 {
 	NVIC_InitTypeDef NVIC_InitStructure;
@@ -21,24 +21,7 @@ static void NVIC_Config(void)
 	NVIC_Init(&NVIC_InitStructure);
 
 }
-
-static void NVIC_DeConfig(void)
-{
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannel = DEBUG_USART_IRQ;	
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-	
-	NVIC_Init(&NVIC_InitStructure);
-	
-	NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream2_IRQ;	
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-
-	NVIC_Init(&NVIC_InitStructure);
-}
+#endif
 
 void USART_Config(void)
 {
@@ -82,23 +65,7 @@ void USART_Config(void)
 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 	
 	USART_Init(DEBUG_USART,&USART_InitStructure);
-
-	NVIC_Config();
 	
-	USART_ITConfig(DEBUG_USART,USART_IT_IDLE, ENABLE);	
-
-	USART_Cmd(DEBUG_USART, ENABLE);
-}
-
-void Usart_DeConfig(void)
-{
-	NVIC_DeConfig();
-	DMA_Cmd(DEBUG_USART_DMA_STREAM, DISABLE);
-	DMA_ITConfig(DEBUG_USART_DMA_STREAM, DMA_IT_TC, DISABLE);
-	DMA_DeInit(DEBUG_USART_DMA_STREAM);
-	USART_Cmd(DEBUG_USART, DISABLE);
-	USART_ITConfig(DEBUG_USART,USART_IT_IDLE, DISABLE);	
-	USART_DeInit(DEBUG_USART);
 }
 
 

@@ -31,6 +31,7 @@
 #include "stm32f4xx_it.h"
 #include "LED/bsp_led.h"
 #include "./Timer/Timer.h"
+#include "./usart/bsp_usart.h"
 
 
 /** @addtogroup Template_Project
@@ -41,8 +42,16 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+extern uint8_t upgrade_mess;
+extern uint16_t count1;
+extern uint16_t count2;
+
+
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
+
+extern __ASM void Switch_To_Boot(void);
+
 
 /******************************************************************************/
 /*            Cortex-M4 Processor Exceptions Handlers                         */
@@ -114,9 +123,9 @@ void UsageFault_Handler(void)
   * @param  None
   * @retval None
   */
-void SVC_Handler(void)
-{
-}
+//void SVC_Handler(void)
+//{
+//}
 
 /**
   * @brief  This function handles Debug Monitor exception.
@@ -132,19 +141,19 @@ void DebugMon_Handler(void)
   * @param  None
   * @retval None
   */
-void PendSV_Handler(void)
-{
-}
+//void PendSV_Handler(void)
+//{
+//}
 
 /**
   * @brief  This function handles SysTick Handler.
   * @param  None
   * @retval None
   */
-void SysTick_Handler(void)
-{
-  //TimingDelay_Decrement();
-}
+//void SysTick_Handler(void)
+//{
+//  //TimingDelay_Decrement();
+//}
 
 /******************************************************************************/
 /*                 STM32F4xx Peripherals Interrupt Handlers                   */
@@ -174,6 +183,24 @@ void User_Timer1_IRQHandler(void)
   }
 }
 
+
+
+
+void DEBUG_USART_IRQHandler(void)
+{
+	char temp;
+	count1++;
+	if(USART_GetITStatus(DEBUG_USART, USART_IT_RXNE) != RESET)
+	{
+		count2++;
+		temp = USART_ReceiveData(DEBUG_USART);
+		if(temp == 'a')
+		{
+			upgrade_mess = 1;
+			//Switch_To_Boot();
+		}
+	}
+}
 
 
 
