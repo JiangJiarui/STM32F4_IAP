@@ -2,43 +2,6 @@
 
 
 
-static void NVIC_Config(void)
-{
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
-	NVIC_InitStructure.NVIC_IRQChannel = DEBUG_USART_IRQ;	
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	
-	NVIC_Init(&NVIC_InitStructure);
-	
-	NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream2_IRQ;	
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-
-	NVIC_Init(&NVIC_InitStructure);
-
-}
-
-static void NVIC_DeConfig(void)
-{
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannel = DEBUG_USART_IRQ;	
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-	
-	NVIC_Init(&NVIC_InitStructure);
-	
-	NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream2_IRQ;	
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-
-	NVIC_Init(&NVIC_InitStructure);
-}
 
 void USART_Config(void)
 {
@@ -83,16 +46,10 @@ void USART_Config(void)
 	
 	USART_Init(DEBUG_USART,&USART_InitStructure);
 
-	NVIC_Config();
-	
-	USART_ITConfig(DEBUG_USART,USART_IT_IDLE, ENABLE);	
-
-	USART_Cmd(DEBUG_USART, ENABLE);
 }
 
 void Usart_DeConfig(void)
 {
-	NVIC_DeConfig();
 	DMA_Cmd(DEBUG_USART_DMA_STREAM, DISABLE);
 	DMA_ITConfig(DEBUG_USART_DMA_STREAM, DMA_IT_TC, DISABLE);
 	DMA_DeInit(DEBUG_USART_DMA_STREAM);
@@ -142,15 +99,7 @@ void USART_DMA_Config(uint32_t * Memory1_Address, uint32_t * Memory2_Address, ui
 	DMA_DoubleBufferModeConfig(DEBUG_USART_DMA_STREAM, (uint32_t)Memory2_Address, DMA_Buffer1);
 	DMA_DoubleBufferModeCmd(DEBUG_USART_DMA_STREAM, ENABLE);
 	
-	DMA_ITConfig(DEBUG_USART_DMA_STREAM, DMA_IT_TC, ENABLE);
-	
-	DMA_Cmd(DEBUG_USART_DMA_STREAM, ENABLE);
-	
-	
-	while(DMA_GetCmdStatus(DEBUG_USART_DMA_STREAM) != ENABLE)
-	{
-		;
-	}
+
 }
 
 void Usart_DMA_BufferSwitch(uint32_t MemoryBaseAddr, uint32_t DMA_MemoryTarget)

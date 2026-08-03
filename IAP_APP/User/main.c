@@ -2,6 +2,7 @@
 #include "./LED/bsp_led.h"
 #include "./Timer/Timer.h"
 #include "./usart/bsp_usart.h"
+#include "./buffer/buffer.h"
 
 
 #define APP_FLAG_addr			((uint32_t)0x08004000)
@@ -15,8 +16,10 @@
 
 
 uint8_t upgrade_mess = 0;
-uint16_t count1 = 0;
-uint16_t count2 = 0;
+
+
+Buffer xBuffer;
+Frame xFrame;
 
 
 __ASM void Switch_To_Boot(void)
@@ -57,6 +60,12 @@ void NVIC_Config(void)
 	NVIC_Init(&NVIC_InitStructure);
 }
 
+void Send_NACK(void)
+{
+	Usart_SendByte(DEBUG_USART, 0xff);
+}
+
+
 int main(void)
 {
 	
@@ -72,36 +81,42 @@ int main(void)
 	USART_ITConfig(DEBUG_USART,USART_IT_RXNE, ENABLE);	
 	USART_Cmd(DEBUG_USART, ENABLE);
 
-
-	DEBUG_INFO("Enter APP Program");
+	BufferInit(&xBuffer);
+	
+//	DEBUG_INFO("Enter APP Program");
+	
 	while(1)
 	{
-		for(int i = 0; i < 5000000; i++)
-			;
-		printf("count1:%d\r count2:%d\n", count1,count2);
-		if(upgrade_mess)
+		if(xBuffer.BufferReadyForRead >= Usart_Min_Frame_Size)
 		{
-			DEBUG_INFO("App Receive Upgrade cmd");
-			upgrade_mess = 0;
-			
-			#if 0
-			if(*(uint32_t*)APP_FLAG_addr == APP_FLAG_A)
+			if(get_frame(&xBuffer, &xFrame) != 0)
 			{
-				while(FLASH_EraseSector(Secotr_Zone_Flag, VoltageRange_3)!= FLASH_COMPLETE)
-					;
-				FLASH_ProgramWord(APP_FLAG_addr, APP_FLAG_A);
+				if(xFrame.cmd == CMD_UPGRADE)
+				{
+					if(crc_check(&xFrame)!=Error)
+						{
+							if(*(uint32_t*)APP_FLAG_addr == APP_FLAG_A)
+							{
+								while(FLASH_EraseSector(Secotr_Zone_Flag, VoltageRange_3)!= FLASH_COMPLETE)
+									;
+								FLASH_ProgramWord(APP_FLAG_addr, APP_FLAG_A);
+							}
+							else if(*(uint32_t*)APP_FLAG_addr == APP_FLAG_B)
+							{
+								while(FLASH_EraseSector(Secotr_Zone_Flag, VoltageRange_3)!= FLASH_COMPLETE)
+									;
+								FLASH_ProgramWord(APP_FLAG_addr, APP_FLAG_B);
+							}
+							FLASH_ProgramWord(UPGRADE_FLAG_addr, UPGRADE_FLAG_Set);
+
+							NVIC_SystemReset();
+						}
+				 else
+					 {
+							Send_NACK();
+					 }
+				}
 			}
-			else if(*(uint32_t*)APP_FLAG_addr == APP_FLAG_B)
-			{
-				while(FLASH_EraseSector(Secotr_Zone_Flag, VoltageRange_3)!= FLASH_COMPLETE)
-					;
-				FLASH_ProgramWord(APP_FLAG_addr, APP_FLAG_B);
-			}
-			FLASH_ProgramWord(UPGRADE_FLAG_addr, UPGRADE_FLAG_Set);
-			#endif
-			
-			
-			NVIC_SystemReset();
 		}
 	}
 		

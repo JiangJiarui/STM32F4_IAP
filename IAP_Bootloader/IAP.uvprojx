@@ -825,6 +825,16 @@
               <FileType>5</FileType>
               <FilePath>.\User\buffer\buffer.h</FilePath>
             </File>
+            <File>
+              <FileName>Timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\timer\Timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>Timer.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\timer\Timer.h</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

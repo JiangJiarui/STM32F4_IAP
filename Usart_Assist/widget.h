@@ -66,5 +66,6 @@ private:
     uint8_t ack_flag;
     uint8_t nack_flag;
 
+
 };
 #endif // WIDGET_H

@@ -5,10 +5,11 @@
 
 #define Ring_Buffer_Size 512
 #define Usart_Frame_Size 138
+#define Usart_Min_Frame_Size 10
 
 #define CMD_WRITE 0xabcd
 #define CMD_END 0xaecd
-#define CMD_UPGRADE 0xa5cd
+#define CMD_UPGRADE		0xa5cd
 
 
 typedef struct{

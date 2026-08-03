@@ -2,6 +2,7 @@
 #include "./led/bsp_led.h"
 #include "./In_Flash_Config.h"
 #include "./buffer/buffer.h"
+#include "./timer/timer.h"
 
 #define Header_len 4
 
@@ -14,9 +15,59 @@ const uint32_t APP_FLAG __attribute__((section("FLAG_ZONE1")));
 const uint32_t UPGRADE_FLAG __attribute__((section("FLAG_ZONE2")));
 
 uint8_t Receive_Complete_Flag = 0;
+uint8_t wait_for_upgrade_timer_timeout = 0;
 
 Buffer xRingBuffer;
 Frame  xUsartFrame;
+
+/********************** NVIC Configuration ******************************/
+
+void NVIC_Config(void)
+{
+	NVIC_InitTypeDef NVIC_InitStructure;
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+	NVIC_InitStructure.NVIC_IRQChannel = DEBUG_USART_IRQ;	
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	
+	NVIC_Init(&NVIC_InitStructure);
+	
+	NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream2_IRQ;	
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+
+	NVIC_Init(&NVIC_InitStructure);
+	
+	NVIC_InitStructure.NVIC_IRQChannel = User_Timer1_IRQ;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	
+	NVIC_Init(&NVIC_InitStructure);
+}
+
+void NVIC_DeConfig(void)
+{
+	NVIC_InitTypeDef NVIC_InitStructure;
+	NVIC_InitStructure.NVIC_IRQChannel = DEBUG_USART_IRQ;	
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+	
+	NVIC_Init(&NVIC_InitStructure);
+	
+	NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream2_IRQ;	
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+
+	NVIC_Init(&NVIC_InitStructure);
+}
+/****************************************************************/
+
+
 
 __ASM void Switch_To_APP(void)
 {	
@@ -65,18 +116,32 @@ void Send_NACK(void)
 
 int main(void)
 {
+/********************* variable define *********************************/
 	uint8_t* pWrite_Flash = NULL;
 	uint32_t bytescount = 0;
 	
-
-	
+/********************* NVIC configuration ********************************/
+	NVIC_Config();
+/********************* USART configuration *******************************/
 	USART_Config();
+	USART_ITConfig(DEBUG_USART,USART_IT_IDLE, ENABLE);
+	USART_Cmd(DEBUG_USART, ENABLE);
+/********************* LED configuration **********************************/
 	LED_GPIO_Config();
-
+	
+/********************* DMA configuration *********************************/
 	USART_DMA_Config((uint32_t *)Received_FILE_Buffer1, 
 										(uint32_t *)Received_FILE_Buffer2, 
 										(uint32_t)DMA_Buffer_Size);
+	DMA_ITConfig(DEBUG_USART_DMA_STREAM, DMA_IT_TC, ENABLE);
+	DMA_Cmd(DEBUG_USART_DMA_STREAM, ENABLE);
+	while(DMA_GetCmdStatus(DEBUG_USART_DMA_STREAM) != ENABLE)
+	{
+		;
+	}
 	USART_DMACmd(DEBUG_USART, USART_DMAReq_Rx, ENABLE);
+/************************************************************************/
+	
 	
 	FLASH_Unlock();
 	FLASH_ClearFlag(FLASH_FLAG_EOP|FLASH_FLAG_OPERR|FLASH_FLAG_WRPERR|
@@ -102,68 +167,109 @@ int main(void)
 		while(FLASH_EraseSector(Sector_Zone_APP2, VoltageRange_3) != FLASH_COMPLETE)
 			;
 	}
+	
 	BufferInit(&xRingBuffer);
 	
 	LED1_ON;
-	DEBUG_INFO("Enter Boot program");
 	
-	while(1)
-		{		
-			if(get_frame(&xRingBuffer, &xUsartFrame) != 0)
-			{
-				if(xUsartFrame.cmd == CMD_WRITE)
-				{
-					if(crc_check(&xUsartFrame)!=Error)
-					{
-						Flash_Write(xUsartFrame.ppayload, pWrite_Flash, xUsartFrame.length);
-						pWrite_Flash += xUsartFrame.length;
-						bytescount += xUsartFrame.length;
-						Send_ACK();
-					}
-					else
-					{
-						Send_NACK();
-					}
-				}
-				else if(xUsartFrame.cmd == CMD_END)
-				{
-					if(crc_check(&xUsartFrame)!=Error)
-					{
-						Receive_Complete_Flag = 1;
-						Send_ACK();						
-						break;
-					}
-					else
-					{
-						Send_NACK();
-					}
-				}
-				ClearFrame(&xUsartFrame);
-			}				
-		}
-		
-		if(Receive_Complete_Flag)
-		{
-			while(FLASH_EraseSector(Sector_Zone_OP, VoltageRange_3) != FLASH_COMPLETE)
-				;
-			if(APP_FLAG == APP_FLAG_A)
-			{
-				Flash_Write((uint8_t*)Addr_Zone_APP1, (uint8_t*)Addr_Zone_OP, bytescount);
-				FLASH_EraseSector(Secotr_Zone_Flag, VoltageRange_3);
-				FLASH_ProgramWord((uint32_t)&APP_FLAG, APP_FLAG_B);
-			}
-			else if(APP_FLAG == APP_FLAG_B)
-			{
-				Flash_Write((uint8_t*)Addr_Zone_APP2, (uint8_t*)Addr_Zone_OP, bytescount);
-				FLASH_EraseSector(Secotr_Zone_Flag, VoltageRange_3);
-				FLASH_ProgramWord((uint32_t)&APP_FLAG, APP_FLAG_A);
-			}
-			
-			Usart_DeConfig();
-			Switch_To_APP();
-			//NVIC_SystemReset();
-		}
-}
+/*************************** Wait for upgrade command from host ******************************/
+  //TIM_Cmd(User_Timer1, ENABLE);
+	
+	uint16_t count = 0;
 
+	while(1)
+		{	
+				if(get_frame(&xRingBuffer, &xUsartFrame) != 0)
+				{
+					if(xUsartFrame.cmd == CMD_UPGRADE)
+					{
+						if(crc_check(&xUsartFrame)!=Error)
+						{
+							if(UPGRADE_FLAG == UPGRADE_FLAG_Reset)
+							{
+								while(FLASH_EraseSector(Secotr_Zone_Flag, VoltageRange_3) != FLASH_COMPLETE)
+									;
+								if(APP_FLAG == APP_FLAG_A){
+									FLASH_ProgramWord((uint32_t)&APP_FLAG, APP_FLAG_A);
+								}
+								else if(APP_FLAG == APP_FLAG_B){
+									FLASH_ProgramWord((uint32_t)&APP_FLAG, APP_FLAG_B);
+								}
+								FLASH_ProgramWord((uint32_t)&UPGRADE_FLAG, UPGRADE_FLAG_Set);									
+							}
+						} // crc
+						else
+						{
+							Send_NACK();
+						}
+						ClearFrame(&xUsartFrame);
+					}
+				}
+			
+				if(UPGRADE_FLAG == UPGRADE_FLAG_Set)
+				{
+					Send_ACK();
+					while(1)
+					{
+							if(get_frame(&xRingBuffer, &xUsartFrame) != 0)
+							{
+								if(xUsartFrame.cmd == CMD_WRITE)
+								{
+									if(crc_check(&xUsartFrame)!=Error)
+									{
+										Flash_Write(xUsartFrame.ppayload, pWrite_Flash, xUsartFrame.length);
+										pWrite_Flash += xUsartFrame.length;
+										bytescount += xUsartFrame.length;
+										Send_ACK();
+										count++;
+									}
+									else
+									{
+										Send_NACK();
+									}
+								}
+								else if(xUsartFrame.cmd == CMD_END)
+								{
+									if(crc_check(&xUsartFrame)!=Error)
+									{
+										Receive_Complete_Flag = 1;
+										Send_ACK();						
+										break;
+									}
+									else
+									{
+										Send_NACK();
+									}
+								}
+								ClearFrame(&xUsartFrame);
+							}				
+					} //while
+					
+					if(Receive_Complete_Flag)
+					{
+						while(FLASH_EraseSector(Sector_Zone_OP, VoltageRange_3) != FLASH_COMPLETE)
+							;
+						if(APP_FLAG == APP_FLAG_A)
+						{
+							Flash_Write((uint8_t*)Addr_Zone_APP1, (uint8_t*)Addr_Zone_OP, bytescount);
+							FLASH_EraseSector(Secotr_Zone_Flag, VoltageRange_3);
+							FLASH_ProgramWord((uint32_t)&APP_FLAG, APP_FLAG_B);
+						}
+						else if(APP_FLAG == APP_FLAG_B)
+						{
+							Flash_Write((uint8_t*)Addr_Zone_APP2, (uint8_t*)Addr_Zone_OP, bytescount);
+							FLASH_EraseSector(Secotr_Zone_Flag, VoltageRange_3);
+							FLASH_ProgramWord((uint32_t)&APP_FLAG, APP_FLAG_A);
+						}
+						
+						FLASH_ProgramWord((uint32_t)&UPGRADE_FLAG, UPGRADE_FLAG_Reset);
+						Usart_DeConfig();
+						Switch_To_APP();
+					}
+				
+			  
+			} //UPGRADE_FLAG == UPGRADE_FLAG_Set
+	 } //while
+}	//main
 
 

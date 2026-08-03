@@ -32,6 +32,7 @@
 #include "./usart/bsp_usart.h"
 #include "./In_Flash_Config.h"
 #include "./buffer/buffer.h"
+#include "./timer/timer.h"
 
 /** @addtogroup Template_Project
   * @{
@@ -49,6 +50,8 @@ extern volatile uint8_t Received_FILE_Buffer2[];
 extern Buffer xRingBuffer;
 
 extern uint8_t Receive_Complete_Flag;
+extern uint8_t wait_for_upgrade_timer_timeout;
+
 
 uint8_t Buffer1_Full_Flag = 0;
 uint8_t Buffer2_Full_Flag = 0;
@@ -249,9 +252,19 @@ void DEBUG_USART_IRQHandler(void)
 					old_offset1 = 0;
 					old_offset2 = 0;
 				}			
-		}
+		}		//USART IDLE
+
 		
 }
+
+void User_Timer1_IRQHandler(void)
+{
+  if(TIM_GetITStatus(User_Timer1, TIM_IT_Update) != RESET)
+  {
+    wait_for_upgrade_timer_timeout = 1;
+  }
+}
+
 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

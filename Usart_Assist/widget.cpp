@@ -287,7 +287,7 @@ void Widget::on_pushButton_FileSend_clicked()
         return;
     }
 
-
+#if 0
     QByteArray startsignal;
     startsignal.append('a');
     m_pSerialPort->write(startsignal);
@@ -295,6 +295,26 @@ void Widget::on_pushButton_FileSend_clicked()
     qDebug() << "send boot cmd and wait";
     timer.exec();
     qDebug() << "wait over";
+#elif 1
+    UserFrame* frame = new UserFrame(0xa5cd, 0, nullptr);
+    framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
+    while(1)
+    {
+        qDebug() << framearray.toHex(' ');
+        m_pSerialPort->write(framearray);
+        WaitforACKloop.exec();
+        if(ack_flag)
+        {
+            ack_flag = 0;
+            break;
+        }
+        else if(nack_flag)
+        {
+            nack_flag = 0;
+        }
+    }
+
+#endif
 
     if(m_pFile != nullptr)
     {
@@ -302,6 +322,7 @@ void Widget::on_pushButton_FileSend_clicked()
         uint32_t j = m_ReadData.length() % MAX_BUFSIZE;
 
         uint32_t k = 0;
+        uint32_t count = 0;
         while(i--)
         {
             QByteArray buf = m_ReadData.mid(MAX_BUFSIZE*(k++), MAX_BUFSIZE);
@@ -314,6 +335,7 @@ void Widget::on_pushButton_FileSend_clicked()
                 WaitforACKloop.exec();
                 if(ack_flag)
                 {
+                    count++;
                     ack_flag = 0;
                     break;
                 }

@@ -32,6 +32,7 @@
 #include "LED/bsp_led.h"
 #include "./Timer/Timer.h"
 #include "./usart/bsp_usart.h"
+#include "./buffer/buffer.h"
 
 
 /** @addtogroup Template_Project
@@ -45,6 +46,9 @@
 extern uint8_t upgrade_mess;
 extern uint16_t count1;
 extern uint16_t count2;
+
+extern Buffer xBuffer;
+
 
 
 /* Private function prototypes -----------------------------------------------*/
@@ -188,17 +192,11 @@ void User_Timer1_IRQHandler(void)
 
 void DEBUG_USART_IRQHandler(void)
 {
-	char temp;
-	count1++;
+	uint8_t temp;
 	if(USART_GetITStatus(DEBUG_USART, USART_IT_RXNE) != RESET)
 	{
-		count2++;
 		temp = USART_ReceiveData(DEBUG_USART);
-		if(temp == 'a')
-		{
-			upgrade_mess = 1;
-			//Switch_To_Boot();
-		}
+		BufferWrite(&xBuffer, &temp, 1);
 	}
 }
 
