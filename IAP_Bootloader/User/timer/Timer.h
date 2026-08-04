@@ -15,6 +15,9 @@
 void Timer_Config(void);
 
 
+void IWDG_Config(void);
+
+
 
 
 #endif		//__TIMER_H

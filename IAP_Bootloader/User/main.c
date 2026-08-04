@@ -144,7 +144,6 @@ int main(void)
 	Timer_Config();
 	TIM_ClearFlag(User_Timer1,TIM_FLAG_Update);
 	TIM_ITConfig(User_Timer1, TIM_IT_Update, ENABLE);
-
 /************************************************************************/
 	
 	
@@ -221,6 +220,7 @@ int main(void)
 										pWrite_Flash += xUsartFrame.length;
 										bytescount += xUsartFrame.length;
 										Send_ACK();
+
 									}
 									else
 									{
@@ -232,7 +232,7 @@ int main(void)
 									if(crc_check(&xUsartFrame)!=Error)
 									{
 										Receive_Complete_Flag = 1;
-										Send_ACK();						
+										Send_ACK();		
 										break;
 									}
 									else

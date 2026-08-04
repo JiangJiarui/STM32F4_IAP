@@ -312,6 +312,10 @@ Section Cross References
     buffer.o(i.get_frame) refers to buffer.o(i.get_halfword) for get_halfword
     buffer.o(i.get_halfword) refers to buffer.o(i.get_byte) for get_byte
     buffer.o(i.write_byte) refers to buffer.o(i.BufferReadyRelease) for BufferReadyRelease
+    timer.o(i.IWDG_Config) refers to stm32f4xx_iwdg.o(i.IWDG_WriteAccessCmd) for IWDG_WriteAccessCmd
+    timer.o(i.IWDG_Config) refers to stm32f4xx_iwdg.o(i.IWDG_SetPrescaler) for IWDG_SetPrescaler
+    timer.o(i.IWDG_Config) refers to stm32f4xx_iwdg.o(i.IWDG_SetReload) for IWDG_SetReload
+    timer.o(i.IWDG_Config) refers to stm32f4xx_iwdg.o(i.IWDG_ReloadCounter) for IWDG_ReloadCounter
     timer.o(i.Timer_Config) refers to stm32f4xx_rcc.o(i.RCC_APB1PeriphClockCmd) for RCC_APB1PeriphClockCmd
     timer.o(i.Timer_Config) refers to stm32f4xx_tim.o(i.TIM_TimeBaseInit) for TIM_TimeBaseInit
     entry.o(.ARM.Collect$$$$00000000) refers (Special) to entry10a.o(.ARM.Collect$$$$0000000D) for __rt_final_cpp
@@ -1134,8 +1138,9 @@ Removing Unused input sections from the image.
     Removing timer.o(.rev16_text), (4 bytes).
     Removing timer.o(.revsh_text), (4 bytes).
     Removing timer.o(.rrx_text), (6 bytes).
+    Removing timer.o(i.IWDG_Config), (32 bytes).
 
-767 unused section(s) (total 26864 bytes) removed from the image.
+768 unused section(s) (total 26896 bytes) removed from the image.
 
 ==============================================================================
 
@@ -1591,18 +1596,18 @@ Memory Map of the image
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x08000000   0x08000000   0x00000188   Data   RO            3    RESET               startup_stm32f40xx.o
-    0x08000188   0x08000188   0x00000000   Code   RO         5227  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
-    0x08000188   0x08000188   0x00000004   Code   RO         5258    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
-    0x0800018c   0x0800018c   0x00000004   Code   RO         5261    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
-    0x08000190   0x08000190   0x00000000   Code   RO         5263    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
-    0x08000190   0x08000190   0x00000000   Code   RO         5265    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
-    0x08000190   0x08000190   0x00000008   Code   RO         5266    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
-    0x08000198   0x08000198   0x00000000   Code   RO         5268    .ARM.Collect$$$$0000000D  mc_w.l(entry10a.o)
-    0x08000198   0x08000198   0x00000000   Code   RO         5270    .ARM.Collect$$$$0000000F  mc_w.l(entry11a.o)
-    0x08000198   0x08000198   0x00000004   Code   RO         5259    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
+    0x08000188   0x08000188   0x00000000   Code   RO         5233  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
+    0x08000188   0x08000188   0x00000004   Code   RO         5264    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
+    0x0800018c   0x0800018c   0x00000004   Code   RO         5267    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
+    0x08000190   0x08000190   0x00000000   Code   RO         5269    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
+    0x08000190   0x08000190   0x00000000   Code   RO         5271    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
+    0x08000190   0x08000190   0x00000008   Code   RO         5272    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
+    0x08000198   0x08000198   0x00000000   Code   RO         5274    .ARM.Collect$$$$0000000D  mc_w.l(entry10a.o)
+    0x08000198   0x08000198   0x00000000   Code   RO         5276    .ARM.Collect$$$$0000000F  mc_w.l(entry11a.o)
+    0x08000198   0x08000198   0x00000004   Code   RO         5265    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
     0x0800019c   0x0800019c   0x00000024   Code   RO         4828    .emb_text           main.o
     0x080001c0   0x080001c0   0x00000024   Code   RO            4    .text               startup_stm32f40xx.o
-    0x080001e4   0x080001e4   0x00000024   Code   RO         5278    .text               mc_w.l(init.o)
+    0x080001e4   0x080001e4   0x00000024   Code   RO         5284    .text               mc_w.l(init.o)
     0x08000208   0x08000208   0x00000018   Code   RO         5110    i.BufferInit        buffer.o
     0x08000220   0x08000220   0x0000000c   Code   RO         5111    i.BufferReadyRelease  buffer.o
     0x0800022c   0x0800022c   0x0000001c   Code   RO         5113    i.BufferWrite       buffer.o
@@ -1662,7 +1667,7 @@ Memory Map of the image
     0x08000af4   0x08000af4   0x00000018   Code   RO         4041    i.TIM_GetITStatus   stm32f4xx_tim.o
     0x08000b0c   0x08000b0c   0x00000014   Code   RO         4045    i.TIM_ITConfig      stm32f4xx_tim.o
     0x08000b20   0x08000b20   0x0000007c   Code   RO         4092    i.TIM_TimeBaseInit  stm32f4xx_tim.o
-    0x08000b9c   0x08000b9c   0x00000028   Code   RO         5203    i.Timer_Config      timer.o
+    0x08000b9c   0x08000b9c   0x00000028   Code   RO         5204    i.Timer_Config      timer.o
     0x08000bc4   0x08000bc4   0x000000d8   Code   RO         4921    i.USART1_IRQHandler  stm32f4xx_it.o
     0x08000c9c   0x08000c9c   0x00000018   Code   RO         4574    i.USART_Cmd         stm32f4xx_usart.o
     0x08000cb4   0x08000cb4   0x0000009c   Code   RO         5008    i.USART_Config      bsp_usart.o
@@ -1679,19 +1684,19 @@ Memory Map of the image
     0x0800102e   0x0800102e   0x00000002   PAD
     0x08001030   0x08001030   0x00000044   Code   RO         5011    i.Usart_DeConfig    bsp_usart.o
     0x08001074   0x08001074   0x00000018   Code   RO         5012    i.Usart_SendByte    bsp_usart.o
-    0x0800108c   0x0800108c   0x0000000e   Code   RO         5282    i.__scatterload_copy  mc_w.l(handlers.o)
-    0x0800109a   0x0800109a   0x00000002   Code   RO         5283    i.__scatterload_null  mc_w.l(handlers.o)
-    0x0800109c   0x0800109c   0x0000000e   Code   RO         5284    i.__scatterload_zeroinit  mc_w.l(handlers.o)
+    0x0800108c   0x0800108c   0x0000000e   Code   RO         5288    i.__scatterload_copy  mc_w.l(handlers.o)
+    0x0800109a   0x0800109a   0x00000002   Code   RO         5289    i.__scatterload_null  mc_w.l(handlers.o)
+    0x0800109c   0x0800109c   0x0000000e   Code   RO         5290    i.__scatterload_zeroinit  mc_w.l(handlers.o)
     0x080010aa   0x080010aa   0x000000b6   Code   RO         5117    i.crc_check         buffer.o
-    0x08001160   0x08001160   0x00000050   Code   RO         5230    i.free              mc_w.l(malloc.o)
+    0x08001160   0x08001160   0x00000050   Code   RO         5236    i.free              mc_w.l(malloc.o)
     0x080011b0   0x080011b0   0x00000032   Code   RO         5118    i.get_byte          buffer.o
     0x080011e2   0x080011e2   0x000000aa   Code   RO         5119    i.get_frame         buffer.o
     0x0800128c   0x0800128c   0x00000018   Code   RO         5120    i.get_halfword      buffer.o
     0x080012a4   0x080012a4   0x000002bc   Code   RO         4834    i.main              main.o
-    0x08001560   0x08001560   0x0000006c   Code   RO         5231    i.malloc            mc_w.l(malloc.o)
+    0x08001560   0x08001560   0x0000006c   Code   RO         5237    i.malloc            mc_w.l(malloc.o)
     0x080015cc   0x080015cc   0x0000002a   Code   RO         5121    i.write_byte        buffer.o
     0x080015f6   0x080015f6   0x00000002   PAD
-    0x080015f8   0x080015f8   0x00000040   Data   RO         5280    Region$$Table       anon$$obj.o
+    0x080015f8   0x080015f8   0x00000040   Data   RO         5286    Region$$Table       anon$$obj.o
 
 
     Execution Region ER_IROM2 (Exec base: 0x08004000, Load base: 0x08001638, Size: 0x00000004, Max: 0x00000004, ABSOLUTE)
@@ -1716,8 +1721,8 @@ Memory Map of the image
     0x20000010   0x08001650   0x00000002   Data   RW         4836    .data               main.o
     0x20000012   0x08001652   0x00000005   Data   RW         4923    .data               stm32f4xx_it.o
     0x20000017   0x08001657   0x00000001   PAD
-    0x20000018   0x08001658   0x00000004   Data   RW         5276    .data               mc_w.l(mvars.o)
-    0x2000001c   0x0800165c   0x00000004   Data   RW         5277    .data               mc_w.l(mvars.o)
+    0x20000018   0x08001658   0x00000004   Data   RW         5282    .data               mc_w.l(mvars.o)
+    0x2000001c   0x0800165c   0x00000004   Data   RW         5283    .data               mc_w.l(mvars.o)
     0x20000020        -       0x000004a0   Zero   RW         4835    .bss                main.o
     0x200004c0        -       0x00000200   Zero   RW            2    HEAP                startup_stm32f40xx.o
     0x200006c0        -       0x00000400   Zero   RW            1    STACK               startup_stm32f40xx.o

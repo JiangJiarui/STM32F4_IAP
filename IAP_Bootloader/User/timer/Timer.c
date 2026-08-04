@@ -18,3 +18,13 @@ void Timer_Config(void)
 }
 
 
+/* 1s IWDG */
+/* not used */
+void IWDG_Config(void)
+{
+	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+	IWDG_SetPrescaler(IWDG_Prescaler_64);
+	IWDG_SetReload(0x271);
+	IWDG_ReloadCounter();
+}
+
