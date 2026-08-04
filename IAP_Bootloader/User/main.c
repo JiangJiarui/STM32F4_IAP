@@ -88,7 +88,7 @@ __ASM void Switch_To_APP(void)
 	nop
 }
 
-void Flash_Write(uint8_t* src, uint8_t* dest, uint16_t bufsize)
+void Flash_Write(uint8_t* src, uint8_t* dest, uint32_t bufsize)
 {
 	uint8_t* pread = src;
 	uint8_t* pwrite = dest;
@@ -140,6 +140,11 @@ int main(void)
 		;
 	}
 	USART_DMACmd(DEBUG_USART, USART_DMAReq_Rx, ENABLE);
+/********************* Timer configuration *********************************/
+	Timer_Config();
+	TIM_ClearFlag(User_Timer1,TIM_FLAG_Update);
+	TIM_ITConfig(User_Timer1, TIM_IT_Update, ENABLE);
+
 /************************************************************************/
 	
 	
@@ -147,8 +152,6 @@ int main(void)
 	FLASH_ClearFlag(FLASH_FLAG_EOP|FLASH_FLAG_OPERR|FLASH_FLAG_WRPERR|
 									FLASH_FLAG_PGAERR|FLASH_FLAG_PGPERR|FLASH_FLAG_PGSERR|FLASH_FLAG_RDERR);
 	
-	while(FLASH_EraseSector(Sector_Zone_OP, VoltageRange_3) != FLASH_COMPLETE)
-		;
 	if((APP_FLAG == APP_FLAG_DEFAULT)&&(UPGRADE_FLAG == UPGRADE_FLAG_DEFAULT))
 	{
 			FLASH_ProgramWord((uint32_t)&APP_FLAG, APP_FLAG_A);
@@ -171,11 +174,7 @@ int main(void)
 	BufferInit(&xRingBuffer);
 	
 	LED1_ON;
-	
-/*************************** Wait for upgrade command from host ******************************/
-  //TIM_Cmd(User_Timer1, ENABLE);
-	
-	uint16_t count = 0;
+  TIM_Cmd(User_Timer1, ENABLE);
 
 	while(1)
 		{	
@@ -208,6 +207,7 @@ int main(void)
 			
 				if(UPGRADE_FLAG == UPGRADE_FLAG_Set)
 				{
+					TIM_Cmd(User_Timer1, DISABLE);
 					Send_ACK();
 					while(1)
 					{
@@ -221,7 +221,6 @@ int main(void)
 										pWrite_Flash += xUsartFrame.length;
 										bytescount += xUsartFrame.length;
 										Send_ACK();
-										count++;
 									}
 									else
 									{
@@ -266,9 +265,22 @@ int main(void)
 						Usart_DeConfig();
 						Switch_To_APP();
 					}
-				
-			  
 			} //UPGRADE_FLAG == UPGRADE_FLAG_Set
+				if(wait_for_upgrade_timer_timeout)
+					{
+						while(FLASH_EraseSector(Sector_Zone_OP, VoltageRange_3) != FLASH_COMPLETE)
+							;
+						if(APP_FLAG == APP_FLAG_A)
+						{
+								Flash_Write((uint8_t*)Addr_Zone_APP2, (uint8_t*)Addr_Zone_OP, Sector_APP_Size);
+						}
+						else if(APP_FLAG == APP_FLAG_B)
+						{
+								Flash_Write((uint8_t*)Addr_Zone_APP1, (uint8_t*)Addr_Zone_OP, Sector_APP_Size);
+						}
+						wait_for_upgrade_timer_timeout = 0;
+						Switch_To_APP();
+					}
 	 } //while
 }	//main
 

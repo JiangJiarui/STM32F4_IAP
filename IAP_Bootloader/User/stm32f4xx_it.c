@@ -262,6 +262,7 @@ void User_Timer1_IRQHandler(void)
   if(TIM_GetITStatus(User_Timer1, TIM_IT_Update) != RESET)
   {
     wait_for_upgrade_timer_timeout = 1;
+		TIM_ClearITPendingBit(User_Timer1, TIM_IT_Update);
   }
 }
 

@@ -83,7 +83,7 @@ int main(void)
 
 	BufferInit(&xBuffer);
 	
-//	DEBUG_INFO("Enter APP Program");
+	DEBUG_INFO("Enter APP Program");
 	
 	while(1)
 	{

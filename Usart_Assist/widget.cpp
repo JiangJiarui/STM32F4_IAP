@@ -322,7 +322,6 @@ void Widget::on_pushButton_FileSend_clicked()
         uint32_t j = m_ReadData.length() % MAX_BUFSIZE;
 
         uint32_t k = 0;
-        uint32_t count = 0;
         while(i--)
         {
             QByteArray buf = m_ReadData.mid(MAX_BUFSIZE*(k++), MAX_BUFSIZE);
@@ -335,7 +334,6 @@ void Widget::on_pushButton_FileSend_clicked()
                 WaitforACKloop.exec();
                 if(ack_flag)
                 {
-                    count++;
                     ack_flag = 0;
                     break;
                 }

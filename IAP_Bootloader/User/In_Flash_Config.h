@@ -20,6 +20,8 @@
 #define Sector_Zone_APP2	FLASH_Sector_7
 #define Secotr_Zone_Flag	FLASH_Sector_1
 
+#define Sector_APP_Size  (128*1024)
+
 #define DMA_Buffer_Size	256  //Byte
 
 
