@@ -104,7 +104,7 @@
 .\objects\pbuf.o: .\User\./eth/bsp_eth.h
 .\objects\pbuf.o: .\User\main.h
 .\objects\pbuf.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\pbuf.o: .\User\./client/client.h
+.\objects\pbuf.o: .\User\./app/tcp_client.h
 .\objects\pbuf.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\pbuf.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\pbuf.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

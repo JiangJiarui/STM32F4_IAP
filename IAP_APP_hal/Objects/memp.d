@@ -104,7 +104,7 @@
 .\objects\memp.o: .\User\./eth/bsp_eth.h
 .\objects\memp.o: .\User\main.h
 .\objects\memp.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\memp.o: .\User\./client/client.h
+.\objects\memp.o: .\User\./app/tcp_client.h
 .\objects\memp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\memp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\memp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

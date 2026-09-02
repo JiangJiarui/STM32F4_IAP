@@ -104,7 +104,7 @@
 .\objects\api_lib.o: .\User\./eth/bsp_eth.h
 .\objects\api_lib.o: .\User\main.h
 .\objects\api_lib.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\api_lib.o: .\User\./client/client.h
+.\objects\api_lib.o: .\User\./app/tcp_client.h
 .\objects\api_lib.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\api_lib.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\api_lib.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

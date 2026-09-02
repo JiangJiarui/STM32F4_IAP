@@ -104,7 +104,7 @@
 .\objects\dhcp.o: .\User\./eth/bsp_eth.h
 .\objects\dhcp.o: .\User\main.h
 .\objects\dhcp.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\dhcp.o: .\User\./client/client.h
+.\objects\dhcp.o: .\User\./app/tcp_client.h
 .\objects\dhcp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\dhcp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\dhcp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

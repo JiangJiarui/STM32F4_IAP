@@ -104,7 +104,7 @@
 .\objects\ip.o: .\User\./eth/bsp_eth.h
 .\objects\ip.o: .\User\main.h
 .\objects\ip.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\ip.o: .\User\./client/client.h
+.\objects\ip.o: .\User\./app/tcp_client.h
 .\objects\ip.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\ip.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\ip.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

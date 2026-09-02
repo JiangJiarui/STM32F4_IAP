@@ -104,7 +104,7 @@
 .\objects\altcp_tcp.o: .\User\./eth/bsp_eth.h
 .\objects\altcp_tcp.o: .\User\main.h
 .\objects\altcp_tcp.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\altcp_tcp.o: .\User\./client/client.h
+.\objects\altcp_tcp.o: .\User\./app/tcp_client.h
 .\objects\altcp_tcp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\altcp_tcp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\altcp_tcp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

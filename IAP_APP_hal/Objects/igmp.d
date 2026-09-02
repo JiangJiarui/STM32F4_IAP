@@ -104,7 +104,7 @@
 .\objects\igmp.o: .\User\./eth/bsp_eth.h
 .\objects\igmp.o: .\User\main.h
 .\objects\igmp.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\igmp.o: .\User\./client/client.h
+.\objects\igmp.o: .\User\./app/tcp_client.h
 .\objects\igmp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\igmp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\igmp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

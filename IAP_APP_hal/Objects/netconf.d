@@ -105,7 +105,7 @@
 .\objects\netconf.o: .\User\./eth/bsp_eth.h
 .\objects\netconf.o: .\User\main.h
 .\objects\netconf.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\netconf.o: .\User\./client/client.h
+.\objects\netconf.o: .\User\./app/tcp_client.h
 .\objects\netconf.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\netconf.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\netconf.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

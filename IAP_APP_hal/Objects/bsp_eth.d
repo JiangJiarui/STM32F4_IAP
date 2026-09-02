@@ -99,5 +99,4 @@
 .\objects\bsp_eth.o: .\Third_Party\FreeRTOS\include\semphr.h
 .\objects\bsp_eth.o: .\User\./eth/bsp_eth.h
 .\objects\bsp_eth.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\bsp_eth.o: .\User\./client/client.h
-.\objects\bsp_eth.o: .\User\main.h
+.\objects\bsp_eth.o: .\User\./app/tcp_client.h

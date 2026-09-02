@@ -10,7 +10,10 @@
 #include <QFile>
 #include <QEventLoop>
 #include <QTimer>
+#include <QMessageBox>
 
+#include <QTcpServer>
+#include <QTcpSocket>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -46,6 +49,16 @@ private slots:
     void on_pushButton_FileSend_clicked();
 
 
+    void on_pushButton_NetConnect_clicked();
+
+    void newClientHandler();
+
+    void on_pushButton_NetDisconnect_clicked();
+
+    void on_pushButton_NetClear_clicked();
+
+    void on_pushButton_NetSend_clicked();
+
 signals:
     void USART_ACK_Received();
     void USART_NACK_Received();
@@ -66,6 +79,8 @@ private:
     uint8_t ack_flag;
     uint8_t nack_flag;
 
+    QTcpServer* m_server = nullptr;
+    QTcpSocket* m_socket = nullptr;
 
 };
 #endif // WIDGET_H

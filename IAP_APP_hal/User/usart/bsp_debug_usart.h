@@ -28,10 +28,10 @@
 #define DEBUG_USART_IRQHandler                  USART1_IRQHandler
 #define DEBUG_USART_IRQ                 		    USART1_IRQn
 
-
-#define DEBUG_ERROR(fmt,arg...)          printf("<<-DEBUG-ERROR->> "fmt"\n",##arg)
-#define DEBUG_INFO(fmt,arg...)          printf("<<-DEBUG-INFO->> "fmt"\n",##arg)
-
+#if USART_DEBUG
+	#define DEBUG_ERROR(fmt,arg...)          printf("<<-DEBUG-ERROR->> "fmt"\n",##arg)
+	#define DEBUG_INFO(fmt,arg...)          printf("<<-DEBUG-INFO->> "fmt"\n",##arg)
+#endif //USART_DEBUG
 
 /************************************************************/
 

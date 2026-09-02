@@ -99,4 +99,4 @@
 .\objects\main.o: User\./eth/bsp_eth.h
 .\objects\main.o: .\User\main.h
 .\objects\main.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\main.o: User\./client/client.h
+.\objects\main.o: User\./app/tcp_client.h

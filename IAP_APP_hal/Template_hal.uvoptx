@@ -1568,8 +1568,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\User\client\client.c</PathWithFileName>
-      <FilenameWithoutPath>client.c</FilenameWithoutPath>
+      <PathWithFileName>.\User\buffer\buffer.c</PathWithFileName>
+      <FilenameWithoutPath>buffer.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1580,8 +1580,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\User\client\client.h</PathWithFileName>
-      <FilenameWithoutPath>client.h</FilenameWithoutPath>
+      <PathWithFileName>.\User\buffer\buffer.h</PathWithFileName>
+      <FilenameWithoutPath>buffer.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1592,8 +1592,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\User\buffer\buffer.c</PathWithFileName>
-      <FilenameWithoutPath>buffer.c</FilenameWithoutPath>
+      <PathWithFileName>.\User\app\tcp_client.c</PathWithFileName>
+      <FilenameWithoutPath>tcp_client.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1604,8 +1604,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\User\buffer\buffer.h</PathWithFileName>
-      <FilenameWithoutPath>buffer.h</FilenameWithoutPath>
+      <PathWithFileName>.\User\app\tcp_client.h</PathWithFileName>
+      <FilenameWithoutPath>tcp_client.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

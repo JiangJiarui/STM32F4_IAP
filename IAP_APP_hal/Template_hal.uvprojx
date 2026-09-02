@@ -931,16 +931,6 @@
               <FilePath>.\User\eth\bsp_eth.h</FilePath>
             </File>
             <File>
-              <FileName>client.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\User\client\client.c</FilePath>
-            </File>
-            <File>
-              <FileName>client.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\User\client\client.h</FilePath>
-            </File>
-            <File>
               <FileName>buffer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\buffer\buffer.c</FilePath>
@@ -949,6 +939,16 @@
               <FileName>buffer.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\buffer\buffer.h</FilePath>
+            </File>
+            <File>
+              <FileName>tcp_client.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\app\tcp_client.c</FilePath>
+            </File>
+            <File>
+              <FileName>tcp_client.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\app\tcp_client.h</FilePath>
             </File>
           </Files>
         </Group>

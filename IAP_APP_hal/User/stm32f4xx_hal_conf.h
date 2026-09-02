@@ -215,6 +215,7 @@
 #define DEST_IP_ADDR2                 1
 #define DEST_IP_ADDR3                12
 #define DEST_PORT                   8080
+#define DEST_IP_ASCII               "192.168.1.12"
 
 /* LOCAL IP ADDRESS */
 #define IP_ADDR0                    192

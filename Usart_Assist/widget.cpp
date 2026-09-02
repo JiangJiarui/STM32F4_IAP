@@ -47,6 +47,8 @@ void Widget::WidgetInit(void)
         ui->plainTextEdit_ReceiveWindow->setReadOnly(true);
     }
     ui->plainTextEdit_ReceiveWindow->setLineWrapMode(QPlainTextEdit::NoWrap);
+
+    ui->label_IPaddr->clear();
 }
 
 void Widget::on_Button_Open_clicked()
@@ -228,7 +230,7 @@ void Widget::PlainTextEdit_ReceiveWindow_Show()
         }
         else
         {
-            strBuf += QString(ReceivedData);
+            strBuf += QString(ReceivedData).append("\r\n");
         }
     }
     else
@@ -287,15 +289,7 @@ void Widget::on_pushButton_FileSend_clicked()
         return;
     }
 
-#if 0
-    QByteArray startsignal;
-    startsignal.append('a');
-    m_pSerialPort->write(startsignal);
-    QTimer::singleShot(8000, &timer, &QEventLoop::quit);
-    qDebug() << "send boot cmd and wait";
-    timer.exec();
-    qDebug() << "wait over";
-#elif 1
+
     UserFrame* frame = new UserFrame(0xa5cd, 0, nullptr);
     framearray = QByteArray::fromRawData((const char*)frame->frame(), (uint8_t)(frame->total_length()));
     while(1)
@@ -313,8 +307,6 @@ void Widget::on_pushButton_FileSend_clicked()
             nack_flag = 0;
         }
     }
-
-#endif
 
     if(m_pFile != nullptr)
     {
@@ -395,5 +387,95 @@ void Widget::on_pushButton_FileSend_clicked()
 }
 
 
-/************************************************************************************/
+/************************************************************************************************************/
+/********************************** Network Communication Function **************************************************/
+
+void Widget::on_pushButton_NetConnect_clicked()
+{
+    QString port;
+
+    if(ui->lineEdit_Port->text().isEmpty())
+    {
+        QMessageBox::information(this, "Connection info", "Please input an valid port number");
+        return;
+    }
+    else
+    {
+        port = ui->lineEdit_Port->text();
+    }
+
+    m_server = new QTcpServer;
+    m_server->listen(QHostAddress::AnyIPv4, port.toShort());
+
+    connect(m_server, &QTcpServer::newConnection, this, &Widget::newClientHandler);
+
+    ui->pushButton_NetConnect->setEnabled(false);
+}
+
+void Widget::newClientHandler()
+{
+    if(m_server == nullptr)
+    {
+        return;
+    }
+    m_socket = m_server->nextPendingConnection();
+
+    ui->label_IPaddr->setText(m_socket->peerAddress().toString());
+}
+
+
+void Widget::on_pushButton_NetDisconnect_clicked()
+{
+    if(m_server==nullptr)
+    {
+        return;
+    }
+    if(m_socket->state() == QAbstractSocket::ConnectedState)
+    {
+        m_socket->disconnectFromHost();
+    }
+    if(m_socket->state() != QAbstractSocket::UnconnectedState)
+    {
+        m_socket->waitForDisconnected(1000);
+    }
+
+    /* must delete class socket first, then class server */
+    delete m_socket;
+    m_socket = nullptr;
+    delete m_server;
+    m_server = nullptr;
+
+
+    ui->pushButton_NetConnect->setEnabled(true);
+    ui->label_IPaddr->clear();
+}
+
+void Widget::on_pushButton_NetClear_clicked()
+{
+    ui->plainTextEdit_Network->clear();
+}
+
+
+void Widget::on_pushButton_NetSend_clicked()
+{
+    if((m_socket != nullptr) && (m_socket->state() == QAbstractSocket::ConnectedState))
+    {
+        QString StringToSend = ui->plainTextEdit_Network->toPlainText();
+
+        if(!m_socket->write(StringToSend.toUtf8()))
+        {
+            qDebug("SerialPort Send Error");
+            return;
+        }
+    }
+}
+
+/************************************************************************************************************/
+
+
+
+
+
+
+
 

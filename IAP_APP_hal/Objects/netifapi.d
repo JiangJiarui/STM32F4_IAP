@@ -104,7 +104,7 @@
 .\objects\netifapi.o: .\User\./eth/bsp_eth.h
 .\objects\netifapi.o: .\User\main.h
 .\objects\netifapi.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\netifapi.o: .\User\./client/client.h
+.\objects\netifapi.o: .\User\./app/tcp_client.h
 .\objects\netifapi.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\netifapi.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\netifapi.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

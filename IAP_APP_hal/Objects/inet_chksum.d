@@ -104,7 +104,7 @@
 .\objects\inet_chksum.o: .\User\./eth/bsp_eth.h
 .\objects\inet_chksum.o: .\User\main.h
 .\objects\inet_chksum.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\inet_chksum.o: .\User\./client/client.h
+.\objects\inet_chksum.o: .\User\./app/tcp_client.h
 .\objects\inet_chksum.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\inet_chksum.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\inet_chksum.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

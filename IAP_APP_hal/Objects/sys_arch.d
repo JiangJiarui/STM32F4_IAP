@@ -102,7 +102,7 @@
 .\objects\sys_arch.o: .\User\./eth/bsp_eth.h
 .\objects\sys_arch.o: .\User\main.h
 .\objects\sys_arch.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\sys_arch.o: .\User\./client/client.h
+.\objects\sys_arch.o: .\User\./app/tcp_client.h
 .\objects\sys_arch.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\sys_arch.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\sys_arch.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

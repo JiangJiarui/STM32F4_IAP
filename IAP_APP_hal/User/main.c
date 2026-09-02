@@ -79,7 +79,7 @@ int main(void)
 
   BufferInit(&xBuffer);
 
-  DEBUG_INFO("Pehripherals initialized success");
+  printf("Pehripherals initialized success");
 
 /** Startup Task create *****************************************************************/
   xReturn = xTaskCreate((TaskFunction_t )StartupTask,
@@ -115,7 +115,9 @@ static void StartupTask(void)
 
 /** ETH Init *******************************/  	
   LwIP_Init();           
-//	client_init();
+	client_init();
+	
+	printf("Network configuration finished");
 	
 /** Threads Create *************************/
 taskENTER_CRITICAL();           

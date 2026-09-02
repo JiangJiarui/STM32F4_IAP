@@ -104,7 +104,7 @@
 .\objects\timeouts.o: .\User\./eth/bsp_eth.h
 .\objects\timeouts.o: .\User\main.h
 .\objects\timeouts.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\timeouts.o: .\User\./client/client.h
+.\objects\timeouts.o: .\User\./app/tcp_client.h
 .\objects\timeouts.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\timeouts.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\timeouts.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

@@ -99,7 +99,7 @@
 .\objects\ethernetif.o: .\User\./eth/bsp_eth.h
 .\objects\ethernetif.o: .\User\main.h
 .\objects\ethernetif.o: .\Third_Party\Lwip\port\driver\./netconf.h
-.\objects\ethernetif.o: .\User\./client/client.h
+.\objects\ethernetif.o: .\User\./app/tcp_client.h
 .\objects\ethernetif.o: .\Third_Party\Lwip\include\lwip/opt.h
 .\objects\ethernetif.o: .\Third_Party\Lwip\port\arch\lwipopts.h
 .\objects\ethernetif.o: .\Third_Party\Lwip\include\lwip/debug.h
