@@ -105,6 +105,7 @@
 .\objects\api_msg.o: .\User\main.h
 .\objects\api_msg.o: .\Third_Party\Lwip\port\driver\./netconf.h
 .\objects\api_msg.o: .\User\./app/tcp_client.h
+.\objects\api_msg.o: .\User\./esp8266/bsp_esp8266.h
 .\objects\api_msg.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\api_msg.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\api_msg.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

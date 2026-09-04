@@ -105,6 +105,7 @@
 .\objects\etharp.o: .\User\main.h
 .\objects\etharp.o: .\Third_Party\Lwip\port\driver\./netconf.h
 .\objects\etharp.o: .\User\./app/tcp_client.h
+.\objects\etharp.o: .\User\./esp8266/bsp_esp8266.h
 .\objects\etharp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\etharp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\etharp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

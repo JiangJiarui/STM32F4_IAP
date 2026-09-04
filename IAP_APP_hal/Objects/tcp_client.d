@@ -100,6 +100,7 @@
 .\objects\tcp_client.o: .\User\main.h
 .\objects\tcp_client.o: .\Third_Party\Lwip\port\driver\./netconf.h
 .\objects\tcp_client.o: .\User\./app/tcp_client.h
+.\objects\tcp_client.o: .\User\./esp8266/bsp_esp8266.h
 .\objects\tcp_client.o: .\Third_Party\Lwip\include\lwip/api.h
 .\objects\tcp_client.o: .\Third_Party\Lwip\include\lwip/opt.h
 .\objects\tcp_client.o: .\Third_Party\Lwip\port\arch\lwipopts.h

@@ -1,15 +1,17 @@
-  #include "./usart/bsp_debug_usart.h"
+#include "./usart/bsp_debug_usart.h"
+#include "./esp8266/bsp_esp8266.h"
 
 UART_HandleTypeDef UartHandle;
+UART_HandleTypeDef ESPUartHandle;
 
  /**
-  * @brief  DEBUG_USART GPIO 
+  * @brief  USART GPIO 
   * @param  
   * @retval 
   */  
-void DEBUG_USART_Config(void)
+void USART_Config(void)
 { 
-  
+/*********************** DEBUG_USART *********************************/
   UartHandle.Instance          = DEBUG_USART;
   
   UartHandle.Init.BaudRate     = DEBUG_USART_BAUDRATE;
@@ -20,8 +22,24 @@ void DEBUG_USART_Config(void)
   UartHandle.Init.Mode         = UART_MODE_TX_RX;
   
   HAL_UART_Init(&UartHandle);
-    
+  
   __HAL_UART_ENABLE_IT(&UartHandle,UART_IT_RXNE);  
+
+/********************** ESP8266 USART ************************************/
+
+  ESPUartHandle.Instance          = ESP_USART;
+  
+  ESPUartHandle.Init.BaudRate     = ESP_USART_BAUDRATE;
+  ESPUartHandle.Init.WordLength   = UART_WORDLENGTH_8B;
+  ESPUartHandle.Init.StopBits     = UART_STOPBITS_1;
+  ESPUartHandle.Init.Parity       = UART_PARITY_NONE;
+  ESPUartHandle.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
+  ESPUartHandle.Init.Mode         = UART_MODE_TX_RX;
+  
+  HAL_UART_Init(&ESPUartHandle);
+
+  __HAL_UART_ENABLE_IT(&ESPUartHandle,UART_IT_RXNE);  
+
 }
 
 
@@ -33,12 +51,16 @@ void DEBUG_USART_Config(void)
 void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 {  
   GPIO_InitTypeDef  GPIO_InitStruct;
-  
+
+/******************** DEBUG USART ****************************************** */
+if(huart->Instance == DEBUG_USART)
+{
   DEBUG_USART_CLK_ENABLE();
 	
 	DEBUG_USART_RX_GPIO_CLK_ENABLE();
   DEBUG_USART_TX_GPIO_CLK_ENABLE();
-  
+
+
 /**USART1 GPIO Configuration    
   PA9     ------> USART1_TX
   PA10    ------> USART1_RX 
@@ -54,8 +76,32 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
   GPIO_InitStruct.Alternate = DEBUG_USART_RX_AF;
   HAL_GPIO_Init(DEBUG_USART_RX_GPIO_PORT, &GPIO_InitStruct); 
  
-  HAL_NVIC_SetPriority(DEBUG_USART_IRQ ,0,1);	
-  HAL_NVIC_EnableIRQ(DEBUG_USART_IRQ );		    
+  HAL_NVIC_SetPriority(DEBUG_USART_IRQ ,1,0);	
+  HAL_NVIC_EnableIRQ(DEBUG_USART_IRQ );
+}
+/************************ ESP8266 USART ************************************ */
+else if(huart->Instance == ESP_USART)
+ {
+    __USART3_CLK_ENABLE();
+    __GPIOB_CLK_ENABLE();
+
+/**USART3 GPIO Configuration    
+  PB10    ------> USART1_TX
+  PB11    ------> USART1_RX 
+  */
+    GPIO_InitStruct.Pin = ESP_TX_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = ESP_GPIO_AF;
+    HAL_GPIO_Init(ESP_TX_PORT, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = ESP_RX_PIN;
+    HAL_GPIO_Init(ESP_RX_PORT, &GPIO_InitStruct);
+
+    HAL_NVIC_SetPriority(ESP_IRQ ,1,0);	
+    HAL_NVIC_EnableIRQ(ESP_IRQ);
+ } 		    
 }
 
 

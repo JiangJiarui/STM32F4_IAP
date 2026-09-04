@@ -105,6 +105,7 @@
 .\objects\if_api.o: .\User\main.h
 .\objects\if_api.o: .\Third_Party\Lwip\port\driver\./netconf.h
 .\objects\if_api.o: .\User\./app/tcp_client.h
+.\objects\if_api.o: .\User\./esp8266/bsp_esp8266.h
 .\objects\if_api.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\if_api.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\if_api.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

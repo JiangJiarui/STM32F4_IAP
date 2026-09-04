@@ -28,17 +28,20 @@
 #define DEBUG_USART_IRQHandler                  USART1_IRQHandler
 #define DEBUG_USART_IRQ                 		    USART1_IRQn
 
-#if USART_DEBUG
-	#define DEBUG_ERROR(fmt,arg...)          printf("<<-DEBUG-ERROR->> "fmt"\n",##arg)
-	#define DEBUG_INFO(fmt,arg...)          printf("<<-DEBUG-INFO->> "fmt"\n",##arg)
-#endif //USART_DEBUG
+
+#define DEBUG_ERROR(fmt,arg...)          printf("<<-DEBUG-ERROR->> "fmt"\n",##arg)
+#define DEBUG_INFO(fmt,arg...)          printf("<<-DEBUG-INFO->> "fmt"\n",##arg)
+
 
 /************************************************************/
 
 void Usart_SendString(uint8_t *str);
 void Usart_SendByte(uint8_t byte);
 
-void DEBUG_USART_Config(void);
+void USART_Config(void);
 
 extern UART_HandleTypeDef UartHandle;
+extern UART_HandleTypeDef ESPUartHandle;
+
+
 #endif /* __USART1_H */

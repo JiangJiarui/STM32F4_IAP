@@ -105,6 +105,7 @@
 .\objects\dns.o: .\User\main.h
 .\objects\dns.o: .\Third_Party\Lwip\port\driver\./netconf.h
 .\objects\dns.o: .\User\./app/tcp_client.h
+.\objects\dns.o: .\User\./esp8266/bsp_esp8266.h
 .\objects\dns.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\dns.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\dns.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

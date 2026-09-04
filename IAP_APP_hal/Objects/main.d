@@ -100,3 +100,4 @@
 .\objects\main.o: .\User\main.h
 .\objects\main.o: .\Third_Party\Lwip\port\driver\./netconf.h
 .\objects\main.o: User\./app/tcp_client.h
+.\objects\main.o: User\./esp8266/bsp_esp8266.h

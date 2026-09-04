@@ -100,3 +100,4 @@
 .\objects\bsp_eth.o: .\User\./eth/bsp_eth.h
 .\objects\bsp_eth.o: .\Third_Party\Lwip\port\driver\./netconf.h
 .\objects\bsp_eth.o: .\User\./app/tcp_client.h
+.\objects\bsp_eth.o: .\User\./esp8266/bsp_esp8266.h

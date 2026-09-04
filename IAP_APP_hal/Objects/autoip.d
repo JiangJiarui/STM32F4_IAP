@@ -105,6 +105,7 @@
 .\objects\autoip.o: .\User\main.h
 .\objects\autoip.o: .\Third_Party\Lwip\port\driver\./netconf.h
 .\objects\autoip.o: .\User\./app/tcp_client.h
+.\objects\autoip.o: .\User\./esp8266/bsp_esp8266.h
 .\objects\autoip.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\autoip.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\autoip.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

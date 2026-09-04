@@ -183,17 +183,26 @@ void  DEBUG_USART_IRQHandler(void)
 	}
 }
 
+void USART3_IRQHandler(void)
+{
+  uint8_t ch=0; 
+  
+	if(__HAL_UART_GET_FLAG(&ESPUartHandle, UART_FLAG_RXNE ) != RESET)
+	{		
+    ch =( uint16_t)READ_REG(ESPUartHandle.Instance->DR);
+    WRITE_REG(UartHandle.Instance->DR,ch); 
+	}
+}
+
 void ETH_IRQHandler(void)
 {
     uint32_t ulReturn;
-  /* 进入临界段，临界段可以嵌套 */
+
   ulReturn = taskENTER_CRITICAL_FROM_ISR();
   
   HAL_ETH_IRQHandler(&heth);
   
-  /* 退出临界段 */
   taskEXIT_CRITICAL_FROM_ISR( ulReturn );
-
 }
 
 /**

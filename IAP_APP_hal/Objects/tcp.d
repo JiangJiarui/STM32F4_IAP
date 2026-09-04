@@ -105,6 +105,7 @@
 .\objects\tcp.o: .\User\main.h
 .\objects\tcp.o: .\Third_Party\Lwip\port\driver\./netconf.h
 .\objects\tcp.o: .\User\./app/tcp_client.h
+.\objects\tcp.o: .\User\./esp8266/bsp_esp8266.h
 .\objects\tcp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\tcp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\tcp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

@@ -29,6 +29,7 @@
 static TaskHandle_t StartupTask_Handle = NULL;
 static TaskHandle_t LEDTask_Handle = NULL;
 static TaskHandle_t CheckUpgradeTask_Handle = NULL;
+static TaskHandle_t ESP_StartupTask_Handle = NULL;
 /**************/
 Buffer xBuffer;
 Frame xFrame;
@@ -44,6 +45,7 @@ void Send_NACK(void);
 static void StartupTask(void);
 static void LED_Task(void);
 static void CheckUpgrade_Task(void);
+static void ESP_StartupTask(void);
 
 /* Private functions ---------------------------------------------------------*/
 /**
@@ -75,7 +77,8 @@ int main(void)
 									FLASH_FLAG_PGAERR|FLASH_FLAG_PGPERR|FLASH_FLAG_PGSERR);
   HAL_FLASH_Lock();
 	LED_GPIO_Config();
-  DEBUG_USART_Config();
+  USART_Config();
+	ESP8266_Init();
 
   BufferInit(&xBuffer);
 
@@ -114,8 +117,8 @@ static void StartupTask(void)
   BaseType_t xReturn = pdPASS;
 
 /** ETH Init *******************************/  	
-  LwIP_Init();           
-	client_init();
+//  LwIP_Init();           
+//	client_init();
 	
 	printf("Network configuration finished");
 	
@@ -145,6 +148,19 @@ taskENTER_CRITICAL();
   }else{
     DEBUG_ERROR("CheckUpgrade_Task created fail");
   }
+
+  xReturn = xTaskCreate((TaskFunction_t )ESP_StartupTask,
+                        (const char*    )"ESP_StartupTask",
+                        (uint16_t       )1024, /* Stack Depth */
+                        (void*          )NULL,
+                        (UBaseType_t    )4, /* Prioirity */
+                        (TaskHandle_t*  )&ESP_StartupTask_Handle);
+  if(pdPASS == xReturn){
+    DEBUG_INFO("CheckUpgrade_Task created success");
+  }else{
+    DEBUG_ERROR("CheckUpgrade_Task created fail");
+  }
+
 
 taskEXIT_CRITICAL();           
 
@@ -217,6 +233,48 @@ static void LED_Task(void)
     LED2_TOGGLE;
     vTaskDelay(1000);
   }
+}
+
+/**
+  * @brief  Startup esp8266 by uart communication
+  * @param  None
+  * @retval None
+  */
+void ESP_StartupTask(void)
+{
+    vTaskDelay(1000);
+  /* test AT launch */
+  ESP_CMD_Send((uint8_t *)"AT\r\n", 50);
+
+  vTaskDelay(100);
+  /* choose WIFI mode: 1 Station; 2 AP; 3 AP+Station */
+  ESP_CMD_Send((uint8_t *)"AT+CWMODE=1\r\n", 50);
+	
+	vTaskDelay(100);
+  /* choose WIFI mode: 1 Station; 2 AP; 3 AP+Station */
+  ESP_CMD_Send((uint8_t *)"AT+CWLAP\r\n", 50);
+
+
+  vTaskDelay(1000);
+  ESP_CMD_Send((uint8_t *)"AT+CWJAP_DEF=\"601\",\"12167586\"\r\n", 1000);
+
+  vTaskDelay(10000);
+  ESP_CMD_Send((uint8_t *)"AT+CIFSR\r\n", 50);
+	
+  vTaskDelay(500);
+  ESP_CMD_Send((uint8_t *)"AT+CIPMUX=0\r\n", 50);
+
+  vTaskDelay(100);
+  ESP_CMD_Send((uint8_t *)"AT+CIPSTART=\"TCP\",\"192.168.2.6\",8080\r\n", 1000);
+
+  vTaskDelay(3000);
+  ESP_CMD_Send((uint8_t *)"AT+CIPSEND=7\r\n", 50);
+
+  vTaskDelay(500);
+  ESP_CMD_Send((uint8_t *)"Hello\r\n", 50);
+
+  vTaskDelay(100);
+  vTaskDelete(NULL);
 }
 
 void Send_NACK(void)

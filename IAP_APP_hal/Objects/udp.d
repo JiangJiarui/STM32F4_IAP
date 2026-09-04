@@ -105,6 +105,7 @@
 .\objects\udp.o: .\User\main.h
 .\objects\udp.o: .\Third_Party\Lwip\port\driver\./netconf.h
 .\objects\udp.o: .\User\./app/tcp_client.h
+.\objects\udp.o: .\User\./esp8266/bsp_esp8266.h
 .\objects\udp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\udp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\udp.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

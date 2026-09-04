@@ -99,6 +99,7 @@
 ".\objects\bsp_eth.o"
 ".\objects\buffer.o"
 ".\objects\tcp_client.o"
+".\objects\bsp_esp8266.o"
 ".\objects\api_lib.o"
 ".\objects\api_msg.o"
 ".\objects\err.o"

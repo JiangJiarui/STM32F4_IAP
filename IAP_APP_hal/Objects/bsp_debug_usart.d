@@ -82,3 +82,4 @@
 .\objects\bsp_debug_usart.o: .\Libraries\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_lptim.h
 .\objects\bsp_debug_usart.o: .\Libraries\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_mmc.h
 .\objects\bsp_debug_usart.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\bsp_debug_usart.o: .\User\./esp8266/bsp_esp8266.h

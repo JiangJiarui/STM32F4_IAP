@@ -105,6 +105,7 @@
 .\objects\netif.o: .\User\main.h
 .\objects\netif.o: .\Third_Party\Lwip\port\driver\./netconf.h
 .\objects\netif.o: .\User\./app/tcp_client.h
+.\objects\netif.o: .\User\./esp8266/bsp_esp8266.h
 .\objects\netif.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\netif.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\netif.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

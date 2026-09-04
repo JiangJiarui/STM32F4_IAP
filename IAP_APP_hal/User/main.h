@@ -16,6 +16,7 @@
 #include "./eth/bsp_eth.h"
 #include "./netconf.h"
 #include "./app/tcp_client.h"
+#include "./esp8266/bsp_esp8266.h"
 
 
 #define APP_FLAG_addr			((uint32_t)0x08004000)
@@ -30,7 +31,6 @@
 extern ETH_HandleTypeDef heth;
 extern Buffer xBuffer;
 
-#define USART_DEBUG			0
 
 #ifndef DEBUG_ERROR
   #define DEBUG_ERROR

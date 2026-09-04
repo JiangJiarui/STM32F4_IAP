@@ -105,6 +105,7 @@
 .\objects\ip4_addr.o: .\User\main.h
 .\objects\ip4_addr.o: .\Third_Party\Lwip\port\driver\./netconf.h
 .\objects\ip4_addr.o: .\User\./app/tcp_client.h
+.\objects\ip4_addr.o: .\User\./esp8266/bsp_esp8266.h
 .\objects\ip4_addr.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\ip4_addr.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\ip4_addr.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h

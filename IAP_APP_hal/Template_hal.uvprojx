@@ -273,8 +273,8 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8020000</StartAddress>
-                <Size>0x20000</Size>
+                <StartAddress>0x8000000</StartAddress>
+                <Size>0x100000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -949,6 +949,16 @@
               <FileName>tcp_client.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\app\tcp_client.h</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_esp8266.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\esp8266\bsp_esp8266.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_esp8266.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\esp8266\bsp_esp8266.h</FilePath>
             </File>
           </Files>
         </Group>

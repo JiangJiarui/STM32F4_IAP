@@ -100,4 +100,5 @@
 .\objects\stm32f4xx_it.o: .\User\main.h
 .\objects\stm32f4xx_it.o: .\Third_Party\Lwip\port\driver\./netconf.h
 .\objects\stm32f4xx_it.o: User\./app/tcp_client.h
+.\objects\stm32f4xx_it.o: User\./esp8266/bsp_esp8266.h
 .\objects\stm32f4xx_it.o: User\stm32f4xx_it.h

@@ -106,6 +106,7 @@
 .\objects\netdb.o: .\User\main.h
 .\objects\netdb.o: .\Third_Party\Lwip\port\driver\./netconf.h
 .\objects\netdb.o: .\User\./app/tcp_client.h
+.\objects\netdb.o: .\User\./esp8266/bsp_esp8266.h
 .\objects\netdb.o: F:\Keil5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\netdb.o: F:\Keil5\ARM\ARMCC\Bin\..\include\inttypes.h
 .\objects\netdb.o: F:\Keil5\ARM\ARMCC\Bin\..\include\limits.h
