@@ -82,7 +82,7 @@ int main(void)
 
   BufferInit(&xBuffer);
 
-  printf("Pehripherals initialized success");
+  printf("Pehripherals initialized success\r\n");
 
 /** Startup Task create *****************************************************************/
   xReturn = xTaskCreate((TaskFunction_t )StartupTask,
@@ -117,10 +117,10 @@ static void StartupTask(void)
   BaseType_t xReturn = pdPASS;
 
 /** ETH Init *******************************/  	
-//  LwIP_Init();           
-//	client_init();
+  LwIP_Init();           
+	client_init();
 	
-	printf("Network configuration finished");
+	printf("Network configuration finished\r\n");
 	
 /** Threads Create *************************/
 taskENTER_CRITICAL();           
@@ -252,10 +252,7 @@ void ESP_StartupTask(void)
 	
 	vTaskDelay(100);
   /* choose WIFI mode: 1 Station; 2 AP; 3 AP+Station */
-  ESP_CMD_Send((uint8_t *)"AT+CWLAP\r\n", 50);
-
-
-  vTaskDelay(1000);
+ 
   ESP_CMD_Send((uint8_t *)"AT+CWJAP_DEF=\"601\",\"12167586\"\r\n", 1000);
 
   vTaskDelay(10000);
@@ -268,12 +265,6 @@ void ESP_StartupTask(void)
   ESP_CMD_Send((uint8_t *)"AT+CIPSTART=\"TCP\",\"192.168.2.6\",8080\r\n", 1000);
 
   vTaskDelay(3000);
-  ESP_CMD_Send((uint8_t *)"AT+CIPSEND=7\r\n", 50);
-
-  vTaskDelay(500);
-  ESP_CMD_Send((uint8_t *)"Hello\r\n", 50);
-
-  vTaskDelay(100);
   vTaskDelete(NULL);
 }
 

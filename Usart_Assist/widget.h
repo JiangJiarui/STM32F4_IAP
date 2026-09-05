@@ -59,6 +59,8 @@ private slots:
 
     void on_pushButton_NetSend_clicked();
 
+    void on_pushButton_clicked();
+
 signals:
     void USART_ACK_Received();
     void USART_NACK_Received();

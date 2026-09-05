@@ -230,7 +230,7 @@ void Widget::PlainTextEdit_ReceiveWindow_Show()
         }
         else
         {
-            strBuf += QString(ReceivedData).append("\r\n");
+            strBuf += QString(ReceivedData);
         }
     }
     else
@@ -240,7 +240,10 @@ void Widget::PlainTextEdit_ReceiveWindow_Show()
     ui->plainTextEdit_ReceiveWindow->insertPlainText(strBuf);
 }
 
-
+void Widget::on_pushButton_clicked()
+{
+    ui->plainTextEdit_ReceiveWindow->clear();
+}
 
 
 
@@ -471,6 +474,9 @@ void Widget::on_pushButton_NetSend_clicked()
 }
 
 /************************************************************************************************************/
+
+
+
 
 
 
